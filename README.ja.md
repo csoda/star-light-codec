@@ -1,16 +1,17 @@
 # Star Light Codec
 
 Star Light Codec は、Star Light プロジェクトから切り出した実験的な
-exact byte compression の公開サンプルです。
+exact byte artifact codec です。
 
-任意のバイト列を `SLB1` という小さな自己説明型アーティファクトにまとめ、
-デコーダー側でサイズ・SHA-256 digest・変換手順を検証してから、元のバイト列を
-完全に復元します。
+任意のバイト列を `SLB1` という自己説明型アーティファクトにまとめ、
+デコーダー側でサイズ、SHA-256 digest、変換手順を検証してから、元のバイト列を
+完全に復元します。ファイル種別を知らなくても exact round-trip できることが、
+この方式の一番強いところです。
 
 これは動画や音楽を再生するための codec pack ではありません。Astro Starlight とも
-無関係です。最初の公開範囲は、圧縮方式そのものよりも「安全に復元できる
-アーティファクト形式」と「読みやすいエンコーダー/デコーダー例」を示すことに
-絞っています。
+無関係です。最初の公開範囲は、強い圧縮アルゴリズムそのものではなく、
+「安全に復元できるアーティファクト形式」と「encoder を進化させても decoder を
+単純に保てる契約」を示すことに絞っています。
 
 ## できること
 
@@ -20,6 +21,40 @@ exact byte compression の公開サンプルです。
 - payload と元入力の SHA-256 検証
 - 全体サイズが大きくなる場合は `keep-original-for-storage` を推奨
 - Star Light 本体の `starlight-byte-exact` 互換プロファイル
+- encoder/decoder 分離による、将来の圧縮方式差し替え余地
+
+## どう強いか
+
+- **任意バイト列を対象にできる:** text、JSON、ログ、バイナリ、生成物、未知の
+  ファイル形式を同じ exact-byte interface で扱えます。
+- **完全復元を検証する:** 元サイズ、payload サイズ、payload digest、最終的な
+  input digest を持ち、復元結果が本当に元データと一致するか確認します。
+- **decoder が単純:** header を読み、長さと digest を検証し、allowlist された
+  transform を逆順に適用するだけです。
+- **encoder を育てられる:** chunking、dictionary、residual、domain-specific codec
+  などを追加しても、exact round-trip の契約を保てます。
+- **圧縮できない時に盛らない:** payload だけでなく artifact 全体が元データより
+  小さいかを見て、保存採用すべきかをメタデータで返します。
+
+## 技術形状
+
+`SLB1` は以下の binary layout を持ちます。
+
+```text
+magic          4 bytes   ASCII "SLB1"
+headerLength   4 bytes   little-endian uint32
+payloadLength  8 bytes   little-endian uint64
+header         N bytes   UTF-8 compact JSON
+payload        M bytes   raw transformed payload bytes
+```
+
+header には `schemaVersion: 2`、`packageKind: starlight-byte-exact`、
+`artifactContainer: slb1`、`strategy`、`transforms`、`inputDigest`、
+`payloadDigest` などが入ります。
+
+payload は JSON 内に埋め込まず、header の後ろに raw bytes として置きます。
+これにより base64 expansion を避けつつ、metadata は人間が inspect できる形を
+保ちます。
 
 ## 使い方
 

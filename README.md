@@ -1,10 +1,14 @@
 # Star Light Codec
 
-Experimental exact byte compression from the Star Light project.
+Experimental exact byte artifact codec from the Star Light project.
 
-Star Light Codec is a small reference project for the byte-artifact codec first
-tested inside [codex-starlight](https://github.com/csoda/codex-starlight). It is
-not a media codec pack, not a video codec, and not related to Astro Starlight.
+Star Light Codec packages arbitrary byte files into self-describing artifacts
+that can be decoded back to the exact original bytes. The first public format,
+`SLB1`, is small on purpose: it combines a binary payload, compact JSON metadata,
+bounded transform planning, and SHA-256 validation into one auditable container.
+
+This is not a media codec pack, not a video codec, and not related to Astro
+Starlight.
 
 The current public slice is deliberately narrow:
 
@@ -13,11 +17,20 @@ The current public slice is deliberately narrow:
 - bounded gzip transform planning;
 - SHA-256 validation for the payload and original input;
 - storage-adoption metadata so incompressible data can stay uncompressed;
-- a compatibility profile for Star Light's `starlight-byte-exact` artifacts.
+- a compatibility profile for Star Light's `starlight-byte-exact` artifacts;
+- an encoder/decoder split where encoders can improve while decoders stay
+  simple.
+
+The important part is not that the first encoder uses gzip. The important part
+is the artifact contract: a decoder can restore exact bytes without knowing the
+source file type, the payload can be validated before and after transforms, and
+new encoder planners can compete on compression ratio without changing the
+baseline decode model.
 
 This repository starts with a readable Python reference implementation. Future
-work can add stronger encoders, domain-specific codecs, and authenticated sealed
-artifacts without making the initial format harder to audit.
+work can add stronger encoders, chunking, dictionaries, domain-specific codecs,
+and authenticated sealed artifacts without making the initial format harder to
+audit.
 
 ## Quick Start
 
@@ -33,13 +46,24 @@ The encoder writes an artifact. The decoder reconstructs the exact original
 bytes. The command output is metadata only; it does not print the package
 payload.
 
-## What This Is
+## Why This Is Strong
 
-Star Light Codec treats a compressed artifact as a small self-describing
-capsule. The decoder stays simple: it reads the container, checks sizes and
-digests, then applies allowlisted transforms in reverse order. Encoder planning
-can improve over time as long as it keeps using compatible primitive
-transforms.
+- **Arbitrary bytes:** text, JSON, logs, binaries, generated artifacts, and
+  unknown file types all use the same exact-byte interface.
+- **Exactness is checked, not assumed:** `SLB1` stores the original byte length,
+  transformed payload length, payload digest, and final input digest.
+- **The decoder is intentionally boring:** it reads the header, verifies the
+  artifact, applies allowlisted transforms in reverse order, and verifies the
+  reconstructed bytes.
+- **Encoder evolution is separated from decode safety:** better planners can
+  choose chunks, dictionaries, residuals, or future domain-specific strategies
+  while preserving an exact compatibility contract.
+- **Compression adoption is honest:** metadata reports whether the whole
+  artifact is smaller than the source. If not, callers can keep the original.
+
+## Technical Shape
+
+`SLB1` is a self-contained exact-byte artifact:
 
 The current `SLB1` artifact is:
 
@@ -50,6 +74,19 @@ payloadLength  8 bytes   little-endian uint64
 header         N bytes   UTF-8 compact JSON
 payload        M bytes   raw transformed payload bytes
 ```
+
+The header records the compatibility profile:
+
+- `schemaVersion: 2`
+- `packageKind: starlight-byte-exact`
+- `artifactContainer: slb1`
+- `packageFormat: layered`
+- `strategy: stored-base64 | gzip-base64 | gzip-recursive-base64`
+- `transforms: [] | ["gzip"] | ["gzip", ...]`
+- `inputDigest` and `payloadDigest` as `sha256:<64 hex>`
+
+The payload is not embedded in JSON. It is stored as raw bytes after the header,
+so the container avoids base64 expansion while keeping the metadata inspectable.
 
 See [docs/spec.md](docs/spec.md) for the exact format contract.
 
@@ -63,8 +100,23 @@ See [docs/spec.md](docs/spec.md) for the exact format contract.
 - Not a codec pack for playing media files.
 
 The current encoder mostly demonstrates the container contract and exact
-validation flow. On redundant data it can be small; on random data it should
-report `keep-original-for-storage`.
+validation flow. On redundant data it can be small; on random or already
+compressed data it should report `keep-original-for-storage`.
+
+## Current Encoder
+
+The reference encoder uses a bounded transform planner:
+
+1. classify the input shape;
+2. try up to four gzip passes;
+3. stop when a pass does not reduce payload size;
+4. write `stored-base64`, `gzip-base64`, or `gzip-recursive-base64` strategy
+   metadata;
+5. compare whole artifact size against the source;
+6. report `use-artifact-for-storage` only when the full artifact is smaller.
+
+This is a baseline, not the ceiling. The roadmap is to make the encoder smarter
+while keeping exact round-trip and fail-closed decode behavior as the invariant.
 
 ## Example Metadata
 
