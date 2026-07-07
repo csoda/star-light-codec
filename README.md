@@ -194,6 +194,16 @@ The current baseline compares raw bytes, gzip, gzip+base64, `SLB1`,
 `--model auto`, and LLM-facing capsule manifests across redundant text, JSON
 logs, ramp bytes, random bytes, and already-compressed input.
 
+For local files, use the real-data harness:
+
+```powershell
+python benchmarks\benchmark_real_data.py README.md src tests --label-root .
+```
+
+It compares `SLB1` and `--model auto` against standard compressors available in
+the local Python environment, verifies exact decode by default, and avoids
+embedding raw file contents in the report.
+
 ## Name Check
 
 The project name is **Star Light Codec**. A quick public search found nearby

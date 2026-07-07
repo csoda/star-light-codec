@@ -148,6 +148,16 @@ synthetic local benchmark は [BENCHMARKS.md](BENCHMARKS.md) にあります。
 LLM 向け capsule manifest を、redundant text、JSON logs、ramp bytes、
 random bytes、already-compressed input で比較しています。
 
+ローカルの実ファイルを比較する場合は、real-data harness を使います。
+
+```powershell
+python benchmarks\benchmark_real_data.py README.md src tests --label-root .
+```
+
+この harness は、`SLB1` と `--model auto` を、手元 Python 環境で使える標準系
+compressor と比較します。既定で exact decode を検証し、レポートに raw file
+contents は埋め込みません。
+
 ## ロードマップ
 
 ロードマップは [docs/roadmap.md](docs/roadmap.md) にあります。

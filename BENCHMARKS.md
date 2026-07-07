@@ -65,3 +65,48 @@ Environment:
   while preserving the same capsule contract.
 
 Machine-readable baseline: [benchmarks/results/transport-baseline.json](benchmarks/results/transport-baseline.json).
+
+## Real-Data Benchmark Harness
+
+Use the real-data harness when you want to compare Star Light Codec against
+standard compressors on local files without publishing file contents:
+
+```powershell
+python benchmarks\benchmark_real_data.py README.md src tests `
+  --label-root . `
+  --format markdown `
+  --max-file-bytes 1048576
+```
+
+For a machine-readable local report:
+
+```powershell
+python benchmarks\benchmark_real_data.py path\to\data `
+  --label-root path\to\data `
+  --format json `
+  --output benchmarks\results\real-data-local.json
+```
+
+The harness reports:
+
+- raw file size;
+- best standard compressor available locally: `gzip`, `zlib`, `bz2`, `lzma`,
+  plus optional `brotli` or `zstd` if installed;
+- baseline `SLB1` size;
+- `--model auto` `SLB1` size and selected prediction model;
+- exact decode verification status.
+
+Privacy and publication notes:
+
+- Raw file contents are never embedded in the report.
+- Absolute paths are avoided when `--label-root` is provided.
+- SHA-256 digests are omitted by default; use `--include-digest` only when the
+  benchmark output is safe to share.
+- Files above `--max-file-bytes` are skipped by default to keep runs bounded.
+- Generated/cache artifacts such as `__pycache__`, `*.pyc`, `*.pyo`, and
+  `*.egg-info` are excluded by default; use `--no-default-excludes` to include
+  them.
+
+This real-data harness is the next step before making broad compression-ratio
+claims. Synthetic fixtures show behavior shape; real data shows whether a model
+is useful outside a toy pattern.

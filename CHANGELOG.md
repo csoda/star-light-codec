@@ -11,6 +11,8 @@
   capsule manifests, and chunk hydration.
 - Added an experimental deterministic `delta-prev-v1` predictive residual model
   with `--model auto` selection.
+- Added a real-data benchmark harness for local file compression comparisons
+  without embedding raw file contents.
 
 ## 0.1.0
 
