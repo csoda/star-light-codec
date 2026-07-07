@@ -27,3 +27,6 @@ slc = "starlight_codec.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+starlight_codec = ["profiles/*.json"]

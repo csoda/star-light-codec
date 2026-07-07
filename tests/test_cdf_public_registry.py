@@ -4,12 +4,18 @@ import json
 import random
 import subprocess
 import sys
+from importlib import resources
 from pathlib import Path
 
 import pytest
 
 import starlight_codec.cdf_public_registry as public_registry
-from starlight_codec.cdf_oracle import PPM_PROFILE_ID, open_cdf_oracle_pack, pack_cdf_oracle
+from starlight_codec.cdf_oracle import (
+    PPM_PROFILE_ID,
+    PROFILE_ID,
+    open_cdf_oracle_pack,
+    pack_cdf_oracle,
+)
 from starlight_codec.cdf_profile_registry import load_profile_descriptor, validate_profile_descriptor
 from starlight_codec.cdf_public_registry import (
     CdfPublicRegistryError,
@@ -68,6 +74,43 @@ def test_public_profile_list_resolves_and_fetches_with_digest_validation(
     assert validate_profile_descriptor(fetched_descriptor).descriptor_digest == fetched[
         "descriptorDigest"
     ]
+
+
+def test_public_profile_descriptors_are_visible_package_resources() -> None:
+    profile_resources = resources.files("starlight_codec").joinpath("profiles")
+    resource_names = {
+        resource.name for resource in profile_resources.iterdir() if resource.is_file()
+    }
+
+    assert f"{PROFILE_ID}.json" in resource_names
+    assert f"{PPM_PROFILE_ID}.json" in resource_names
+
+    for profile_id in (PROFILE_ID, PPM_PROFILE_ID):
+        resource = profile_resources.joinpath(f"{profile_id}.json")
+        descriptor = json.loads(resource.read_text(encoding="utf-8"))
+
+        assert validate_profile_descriptor(descriptor).profile_id == profile_id
+
+
+def test_public_profile_resolver_fetches_from_package_resources_without_repo_profiles(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    missing_repo_profiles = tmp_path / "missing-repo-profiles"
+    monkeypatch.setattr(
+        public_registry,
+        "_repo_profile_path",
+        lambda profile_id: missing_repo_profiles / f"{profile_id}.json",
+    )
+
+    descriptor = resolve_public_profile_descriptor(PPM_PROFILE_ID)
+    validation = validate_profile_descriptor(descriptor)
+    fetched = fetch_public_profile_descriptor(PPM_PROFILE_ID, tmp_path / "cache")
+    fetched_descriptor = load_profile_descriptor(fetched["path"])
+
+    assert validation.profile_id == PPM_PROFILE_ID
+    assert fetched["descriptorDigest"] == validation.descriptor_digest
+    assert validate_profile_descriptor(fetched_descriptor).profile_hash == validation.profile_hash
 
 
 def test_public_component_list_resolves_fetches_and_validates(tmp_path: Path) -> None:

@@ -70,12 +70,12 @@ python -m starlight_codec cdf open input.cdf-pack input.cdf-pack.json output.txt
 
 The standalone package lane now has a small deterministic public mirror in
 `starlight_codec.cdf_public_registry`. It is local-only: no network fetch is
-performed, and in the current source/editable layout the resolver loads
-checked-in profile descriptors from the repository `profiles/*.json` directory
-with descriptor hash validation before use or copy. `pyproject.toml` does not
-yet package those descriptors as wheel data, so installed wheels should not be
-treated as carrying this public mirror until a follow-up packaging pass adds
-and validates package data.
+performed, and packaged installs carry the public profile descriptors as
+`starlight_codec/profiles/*.json` package data. The resolver prefers those
+package resources via `importlib.resources`, validates descriptor hashes before
+use or copy, and keeps the repository `profiles/*.json` directory as the
+source/editable reference fallback. External mirrors, detached signing, and
+network distribution remain future work.
 
 Public APIs:
 

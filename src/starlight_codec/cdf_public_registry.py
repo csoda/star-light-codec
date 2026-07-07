@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import json
 import re
-import shutil
+from dataclasses import dataclass
+from importlib import resources
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
 from .cdf_oracle import (
     CODER_ID,
@@ -20,6 +21,7 @@ from .cdf_profile_registry import (
     CdfProfileRegistryError,
     canonical_json_sha256,
     load_profile_descriptor,
+    parse_profile_descriptor,
     validate_profile_descriptor,
 )
 
@@ -54,6 +56,13 @@ class CdfPublicRegistryError(ValueError):
     """Raised when bundled public profile/component resolution fails closed."""
 
 
+@dataclass(frozen=True)
+class _ProfileSource:
+    location: str
+    read_text: Callable[[], str]
+    read_bytes: Callable[[], bytes]
+
+
 def _repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
@@ -62,8 +71,53 @@ def _profiles_dir() -> Path:
     return _repo_root() / "profiles"
 
 
-def _profile_path(profile_id: str) -> Path:
+def _repo_profile_path(profile_id: str) -> Path:
     return _profiles_dir() / f"{profile_id}.json"
+
+
+def _packaged_profile_resource(profile_id: str) -> Any:
+    return resources.files("starlight_codec").joinpath(
+        "profiles", f"{profile_id}.json"
+    )
+
+
+def _profile_source(profile_id: str) -> _ProfileSource:
+    if profile_id not in _PUBLIC_PROFILE_FILENAMES:
+        raise CdfPublicRegistryError(f"missing public profile: {profile_id}")
+
+    resource = _packaged_profile_resource(profile_id)
+    if resource.is_file():
+        return _ProfileSource(
+            location=f"starlight_codec/profiles/{profile_id}.json",
+            read_text=lambda: resource.read_text(encoding="utf-8"),
+            read_bytes=resource.read_bytes,
+        )
+
+    path = _repo_profile_path(profile_id)
+    if path.is_file():
+        return _ProfileSource(
+            location=str(path),
+            read_text=lambda: path.read_text(encoding="utf-8"),
+            read_bytes=path.read_bytes,
+        )
+
+    raise CdfPublicRegistryError(f"missing bundled public profile file: {profile_id}")
+
+
+def _load_public_profile_descriptor(
+    profile_id: str,
+) -> tuple[dict[str, Any], _ProfileSource]:
+    source = _profile_source(profile_id)
+    try:
+        descriptor = parse_profile_descriptor(source.read_text())
+        validation = validate_profile_descriptor(descriptor)
+    except (CdfProfileRegistryError, OSError) as exc:
+        raise CdfPublicRegistryError(
+            f"public profile descriptor failed validation: {profile_id}: {exc}"
+        ) from exc
+    if validation.profile_id != profile_id:
+        raise CdfPublicRegistryError("public profile descriptor id mismatch")
+    return descriptor, source
 
 
 def _component_digest(component: dict[str, Any]) -> str:
@@ -104,9 +158,9 @@ def _reject_unknown_component_fields(
         raise CdfPublicRegistryError(f"unknown component fields: {unknown}")
 
 
-_PUBLIC_PROFILE_PATHS = {
-    PROFILE_ID: _profile_path(PROFILE_ID),
-    PPM_PROFILE_ID: _profile_path(PPM_PROFILE_ID),
+_PUBLIC_PROFILE_FILENAMES = {
+    PROFILE_ID: f"{PROFILE_ID}.json",
+    PPM_PROFILE_ID: f"{PPM_PROFILE_ID}.json",
 }
 
 _PUBLIC_COMPONENTS = (
@@ -236,8 +290,8 @@ _PUBLIC_COMPONENTS_BY_ID = {
 
 def list_public_profiles() -> list[dict[str, Any]]:
     profiles: list[dict[str, Any]] = []
-    for profile_id in sorted(_PUBLIC_PROFILE_PATHS):
-        descriptor = resolve_public_profile_descriptor(profile_id)
+    for profile_id in sorted(_PUBLIC_PROFILE_FILENAMES):
+        descriptor, source = _load_public_profile_descriptor(profile_id)
         validation = validate_profile_descriptor(descriptor)
         profiles.append(
             {
@@ -248,7 +302,7 @@ def list_public_profiles() -> list[dict[str, Any]]:
                 "availability": validation.availability,
                 "oracleKind": validation.oracle_kind,
                 "coderId": validation.coder_id,
-                "path": str(_PUBLIC_PROFILE_PATHS[profile_id]),
+                "path": source.location,
             }
         )
     return profiles
@@ -271,31 +325,17 @@ def list_public_components(
 
 
 def resolve_public_profile_descriptor(profile_id: str) -> dict[str, Any]:
-    path = _PUBLIC_PROFILE_PATHS.get(profile_id)
-    if path is None:
-        raise CdfPublicRegistryError(f"missing public profile: {profile_id}")
-    if not path.is_file():
-        raise CdfPublicRegistryError(f"missing bundled public profile file: {profile_id}")
-    try:
-        descriptor = load_profile_descriptor(path)
-        validation = validate_profile_descriptor(descriptor)
-    except CdfProfileRegistryError as exc:
-        raise CdfPublicRegistryError(
-            f"public profile descriptor failed validation: {profile_id}: {exc}"
-        ) from exc
-    if validation.profile_id != profile_id:
-        raise CdfPublicRegistryError("public profile descriptor id mismatch")
+    descriptor, _source = _load_public_profile_descriptor(profile_id)
     return descriptor
 
 
 def fetch_public_profile_descriptor(profile_id: str, output_dir: str | Path) -> dict[str, Any]:
-    descriptor = resolve_public_profile_descriptor(profile_id)
+    descriptor, source = _load_public_profile_descriptor(profile_id)
     validation = validate_profile_descriptor(descriptor)
-    source = _PUBLIC_PROFILE_PATHS[profile_id]
     target_dir = Path(output_dir)
     target_dir.mkdir(parents=True, exist_ok=True)
     target = target_dir / f"{profile_id}.json"
-    shutil.copyfile(source, target)
+    target.write_bytes(source.read_bytes())
     fetched = load_profile_descriptor(target)
     fetched_validation = validate_profile_descriptor(fetched)
     if fetched_validation.descriptor_digest != validation.descriptor_digest:

@@ -1,0 +1,83 @@
+{
+  "availability": "public-registry",
+  "canonicalJson": "slc-canonical-json-v0",
+  "compatibility": {
+    "containers": [],
+    "notCompatibleWith": [],
+    "supersedes": [
+      "byte-context-cdf-v0"
+    ]
+  },
+  "decodeContract": {
+    "context": {
+      "maxContextBytes": 1024,
+      "maxOrder": 8,
+      "slicing": "trailing-decoded-bytes",
+      "unit": "byte"
+    },
+    "entropyCoder": {
+      "coderId": "integer-arithmetic-range-v0",
+      "flushRule": "pending-bits-final-quarter-v0",
+      "stateBits": 32
+    },
+    "frequencyModel": {
+      "baseFrequency": 1,
+      "countSource": "decodedTrailingContext",
+      "matchScale": 96,
+      "matchScaleByOrder": true,
+      "matchSelection": "longest-suffix-prior-follow-byte-v0",
+      "modelId": "byte-ppm-suffix-recency-v0",
+      "recencyScale": 1,
+      "recencyWindow": 128
+    },
+    "frequencyToCdf": {
+      "cdfTotal": 65536,
+      "minimumSymbolFrequency": 1,
+      "quantization": "floor-proportional-min1-remainder-desc-byte-asc",
+      "tieBreak": "byte-ascending"
+    },
+    "goldenVectors": [
+      {
+        "decodedDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "encodedBitLength": 2,
+        "inputDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "name": "empty",
+        "payloadBytes": 1,
+        "payloadDigest": "sha256:c3641f8544d7c02f3580b07c0f9887f0c6a27ff5ab1d4a3e29caf197cfc299ae"
+      }
+    ],
+    "oracleKind": "byte-ppm-context-v0",
+    "resourceLimits": {
+      "maxContextBytes": 1024,
+      "maxDecodeMemoryBytes": 1048576,
+      "maxDecoderStateBits": 32,
+      "maxPayloadExpansionRatio": 1024,
+      "maxProfileBytes": 65536,
+      "maxSymbolAlphabetSize": 256,
+      "streaming": true
+    },
+    "symbolAlphabet": "byte256"
+  },
+  "descriptorDigest": "sha256:689ab31dfc89952d8014271328239bf6c5cd4bd3af8313e2cd0ae9b0713443db",
+  "distribution": {
+    "assetUris": [],
+    "license": "Apache-2.0",
+    "primaryUri": "profiles/byte-ppm-context-v0.json",
+    "publishedAt": "2026-07-08",
+    "retainUntil": "2027-07-08"
+  },
+  "fallback": {
+    "mode": "none"
+  },
+  "profileClass": "stream-small",
+  "profileHash": "sha256:7701b3e4632900e7a44714aab01ca2aeb526da9e4fce064d9aa31f1f6c5894a1",
+  "profileId": "byte-ppm-context-v0",
+  "profileVersion": 0,
+  "schema": "slc-cdf-profile-registry-v0",
+  "security": {
+    "attackerControlledInputWarning": true,
+    "notes": "Compression is not encryption; the PPM predictor is deterministic and public.",
+    "secretProfile": false
+  },
+  "status": "experimental"
+}
