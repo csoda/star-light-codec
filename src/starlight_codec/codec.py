@@ -3,6 +3,7 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
+import os
 import struct
 from dataclasses import dataclass
 from pathlib import Path
@@ -27,6 +28,13 @@ class EncodeResult:
 class DecodeResult:
     metadata: dict[str, Any]
     data: bytes
+
+
+@dataclass(frozen=True)
+class CapsuleResult:
+    metadata: dict[str, Any]
+    capsule: dict[str, Any]
+    artifact: bytes
 
 
 def sha256_digest(data: bytes) -> str:
@@ -244,3 +252,208 @@ def decode_file(input_path: str | Path, output_path: str | Path) -> dict[str, An
     result = decode_slb1(artifact)
     Path(output_path).write_bytes(result.data)
     return result.metadata
+
+
+def parse_byte_range(range_spec: str, raw_bytes: int) -> tuple[int, int]:
+    if ":" not in range_spec:
+        raise StarLightCodecError("Byte range must use start:end syntax.")
+    start_text, end_text = range_spec.split(":", 1)
+    start = int(start_text) if start_text else 0
+    end = int(end_text) if end_text else raw_bytes
+    if start < 0 or end < start or end > raw_bytes:
+        raise StarLightCodecError("Byte range is outside the decoded data.")
+    return start, end
+
+
+def build_chunk_index(data: bytes, chunk_size: int = 4096) -> list[dict[str, Any]]:
+    bounded_size = max(1, int(chunk_size))
+    chunks: list[dict[str, Any]] = []
+    for index, start in enumerate(range(0, len(data), bounded_size), start=1):
+        end = min(start + bounded_size, len(data))
+        chunk = data[start:end]
+        chunks.append(
+            {
+                "chunkId": f"c{index:04d}",
+                "start": start,
+                "end": end,
+                "rawBytes": len(chunk),
+                "digest": sha256_digest(chunk),
+            }
+        )
+    return chunks
+
+
+def _relative_artifact_ref(artifact_path: Path, capsule_path: Path) -> str:
+    base = capsule_path.parent if capsule_path.parent != Path("") else Path(".")
+    return os.path.relpath(artifact_path, base).replace("\\", "/")
+
+
+def create_capsule(
+    data: bytes,
+    artifact_path: str | Path,
+    capsule_path: str | Path,
+    max_passes: int = 1,
+    summary: str = "",
+    tags: list[str] | None = None,
+    chunk_size: int = 4096,
+) -> CapsuleResult:
+    artifact_target = Path(artifact_path)
+    capsule_target = Path(capsule_path)
+    encoded = encode_slb1(data, max_passes=max_passes)
+    normalized_tags = sorted({tag.strip() for tag in (tags or []) if tag.strip()})
+    artifact_ref = _relative_artifact_ref(artifact_target, capsule_target)
+    capsule = {
+        "schemaVersion": 1,
+        "kind": "slc-llm-transport",
+        "artifactRef": artifact_ref,
+        "artifactContainer": "slb1",
+        "artifactProfile": "starlight-byte-exact",
+        "artifactDigest": sha256_digest(encoded.artifact),
+        "artifactBytes": len(encoded.artifact),
+        "rawBytes": len(data),
+        "inputDigest": encoded.metadata["inputDigest"],
+        "classification": encoded.metadata["classification"],
+        "strategy": encoded.metadata["strategy"],
+        "transforms": list(encoded.metadata["transforms"]),
+        "recommendedForStorage": encoded.metadata["recommendedForStorage"],
+        "adoptionDecision": encoded.metadata["adoptionDecision"],
+        "summary": summary,
+        "semanticTags": normalized_tags,
+        "chunkIndex": build_chunk_index(data, chunk_size=chunk_size),
+        "hydrate": {
+            "tool": "slc hydrate",
+            "supports": ["full", "range", "chunk"],
+            "rangeSyntax": "start:end",
+        },
+    }
+    return CapsuleResult(
+        metadata={
+            "action": "capsule",
+            "kind": capsule["kind"],
+            "artifactRef": artifact_ref,
+            "artifactBytes": len(encoded.artifact),
+            "rawBytes": len(data),
+            "inputDigest": encoded.metadata["inputDigest"],
+            "artifactDigest": capsule["artifactDigest"],
+            "chunkCount": len(capsule["chunkIndex"]),
+            "recommendedForStorage": encoded.metadata["recommendedForStorage"],
+            "adoptionDecision": encoded.metadata["adoptionDecision"],
+        },
+        capsule=capsule,
+        artifact=encoded.artifact,
+    )
+
+
+def create_capsule_file(
+    input_path: str | Path,
+    artifact_path: str | Path,
+    capsule_path: str | Path,
+    max_passes: int = 1,
+    summary: str = "",
+    tags: list[str] | None = None,
+    chunk_size: int = 4096,
+) -> dict[str, Any]:
+    data = Path(input_path).read_bytes()
+    result = create_capsule(
+        data,
+        artifact_path=artifact_path,
+        capsule_path=capsule_path,
+        max_passes=max_passes,
+        summary=summary,
+        tags=tags,
+        chunk_size=chunk_size,
+    )
+    artifact_target = Path(artifact_path)
+    capsule_target = Path(capsule_path)
+    artifact_target.parent.mkdir(parents=True, exist_ok=True)
+    capsule_target.parent.mkdir(parents=True, exist_ok=True)
+    artifact_target.write_bytes(result.artifact)
+    capsule_target.write_text(json.dumps(result.capsule, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return result.metadata
+
+
+def _read_capsule(path: Path) -> dict[str, Any]:
+    try:
+        capsule = json.loads(path.read_text(encoding="utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise StarLightCodecError("Capsule is not valid UTF-8 JSON.") from exc
+    if capsule.get("kind") != "slc-llm-transport":
+        raise StarLightCodecError("Unsupported capsule kind.")
+    if capsule.get("schemaVersion") != 1:
+        raise StarLightCodecError("Unsupported capsule schema version.")
+    if "data" in capsule:
+        raise StarLightCodecError("Capsule must not embed raw data.")
+    return capsule
+
+
+def _resolve_capsule_artifact(capsule_path: Path, capsule: dict[str, Any]) -> Path:
+    artifact_ref = str(capsule.get("artifactRef", ""))
+    if not artifact_ref:
+        raise StarLightCodecError("Capsule is missing artifactRef.")
+    if Path(artifact_ref).is_absolute():
+        raise StarLightCodecError("Capsule artifactRef must be relative.")
+    return (capsule_path.parent / artifact_ref).resolve()
+
+
+def _read_artifact_or_capsule(input_path: Path) -> tuple[bytes, dict[str, Any] | None]:
+    probe = input_path.read_bytes()
+    if probe.startswith(MAGIC_SLB1):
+        return probe, None
+    capsule = _read_capsule(input_path)
+    artifact_path = _resolve_capsule_artifact(input_path, capsule)
+    artifact = artifact_path.read_bytes()
+    if sha256_digest(artifact) != capsule.get("artifactDigest"):
+        raise StarLightCodecError("Capsule artifact digest mismatch.")
+    return artifact, capsule
+
+
+def _chunk_from_capsule(capsule: dict[str, Any], chunk_id: str) -> dict[str, Any]:
+    for chunk in capsule.get("chunkIndex", []):
+        if chunk.get("chunkId") == chunk_id:
+            return chunk
+    raise StarLightCodecError("Chunk id was not found in the capsule.")
+
+
+def hydrate_file(
+    input_path: str | Path,
+    output_path: str | Path,
+    byte_range: str | None = None,
+    chunk_id: str | None = None,
+) -> dict[str, Any]:
+    if byte_range and chunk_id:
+        raise StarLightCodecError("Use either byte_range or chunk_id, not both.")
+    source_path = Path(input_path)
+    artifact, capsule = _read_artifact_or_capsule(source_path)
+    decoded = decode_slb1(artifact)
+    start, end = 0, len(decoded.data)
+    hydrate_mode = "full"
+    expected_output_digest = ""
+    if chunk_id:
+        if capsule is None:
+            raise StarLightCodecError("Chunk hydration requires a capsule input.")
+        chunk = _chunk_from_capsule(capsule, chunk_id)
+        start, end = int(chunk["start"]), int(chunk["end"])
+        expected_output_digest = str(chunk.get("digest", ""))
+        hydrate_mode = "chunk"
+    elif byte_range:
+        start, end = parse_byte_range(byte_range, len(decoded.data))
+        hydrate_mode = "range"
+    if start < 0 or end < start or end > len(decoded.data):
+        raise StarLightCodecError("Hydration range is outside the decoded data.")
+    hydrated = decoded.data[start:end]
+    output_digest = sha256_digest(hydrated)
+    if expected_output_digest and output_digest != expected_output_digest:
+        raise StarLightCodecError("Capsule chunk digest mismatch.")
+    Path(output_path).write_bytes(hydrated)
+    return {
+        "action": "hydrate",
+        "hydrateMode": hydrate_mode,
+        "chunkId": chunk_id or "",
+        "start": start,
+        "end": end,
+        "outputBytes": len(hydrated),
+        "outputDigest": output_digest,
+        "inputDigest": decoded.metadata["inputDigest"],
+        "artifactDigest": sha256_digest(artifact),
+        "sourceKind": "capsule" if capsule is not None else "slb1",
+    }

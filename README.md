@@ -39,6 +39,8 @@ python -m pip install -e .[test]
 python -m starlight_codec encode README.md README.slb1 --max-passes 2
 python -m starlight_codec inspect README.slb1
 python -m starlight_codec decode README.slb1 README.roundtrip.md
+python -m starlight_codec capsule README.md README.slb1 README.capsule.json --tag docs
+python -m starlight_codec hydrate README.capsule.json README.chunk.md --chunk c0001
 pytest
 ```
 
@@ -118,6 +120,29 @@ The reference encoder uses a bounded transform planner:
 This is a baseline, not the ceiling. The roadmap is to make the encoder smarter
 while keeping exact round-trip and fail-closed decode behavior as the invariant.
 
+## LLM Transport Capsules
+
+Do not ask an LLM to understand gzip, base64, or compressed payload bytes
+directly. Treat compressed bytes as opaque.
+
+Star Light Codec now includes an LLM-facing transport layer:
+
+```powershell
+python -m starlight_codec capsule input.bin input.slb1 input.capsule.json `
+  --summary "Asset metadata fixture" `
+  --tag exact-roundtrip
+
+python -m starlight_codec hydrate input.capsule.json chunk.bin --chunk c0001
+python -m starlight_codec hydrate input.slb1 range.bin --range 0:4096
+```
+
+The capsule is a compact JSON manifest for the model: artifact reference,
+digests, sizes, strategy, semantic tags, summary, and chunk index. It does not
+embed raw bytes or base64 payloads. Hydration is performed by the tool layer so
+the model can reason over metadata and request exact bytes only when needed.
+
+See [docs/llm-transport.md](docs/llm-transport.md).
+
 ## Example Metadata
 
 ```json
@@ -137,8 +162,8 @@ while keeping exact round-trip and fail-closed decode behavior as the invariant.
 ## Roadmap
 
 The roadmap is in [docs/roadmap.md](docs/roadmap.md). The next planned tracks
-are smarter encoder planning, chunking, dictionaries, domain-specific residual
-codecs, and a separate authenticated sealing layer.
+are smarter encoder planning, physical chunked containers, dictionaries,
+domain-specific residual codecs, and a separate authenticated sealing layer.
 
 ## Name Check
 

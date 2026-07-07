@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added LLM transport capsules for metadata-only model handoff.
+- Added `hydrate` support for full, byte-range, and capsule chunk output.
+- Documented the rule that compressed bytes are opaque to LLMs.
+
 ## 0.1.0
 
 - Initial public reference implementation.

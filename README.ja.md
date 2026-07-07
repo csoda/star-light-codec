@@ -63,6 +63,8 @@ python -m pip install -e .[test]
 python -m starlight_codec encode README.md README.slb1 --max-passes 2
 python -m starlight_codec inspect README.slb1
 python -m starlight_codec decode README.slb1 README.roundtrip.md
+python -m starlight_codec capsule README.md README.slb1 README.capsule.json --tag docs
+python -m starlight_codec hydrate README.capsule.json README.chunk.md --chunk c0001
 pytest
 ```
 
@@ -70,12 +72,36 @@ pytest
 バイト列が完全に復元されます。CLI の出力はメタデータだけで、payload 本体は表示
 しません。
 
+## LLM transport capsule
+
+LLM に gzip、base64、圧縮済みpayloadを直接読ませる方針は取りません。
+圧縮済みbytesは LLM から見ると opaque なデータとして扱います。
+
+代わりに、LLM には軽い capsule manifest を渡します。
+
+```powershell
+python -m starlight_codec capsule input.bin input.slb1 input.capsule.json `
+  --summary "Asset metadata fixture" `
+  --tag exact-roundtrip
+
+python -m starlight_codec hydrate input.capsule.json chunk.bin --chunk c0001
+python -m starlight_codec hydrate input.slb1 range.bin --range 0:4096
+```
+
+capsule には artifact reference、digest、サイズ、strategy、semantic tags、
+summary、chunk index が入ります。raw bytes や base64 payload は埋め込みません。
+LLM は metadata を読んで判断し、必要な時だけ tool layer で exact bytes を
+hydrate します。
+
+詳しくは [docs/llm-transport.md](docs/llm-transport.md) を参照してください。
+
 ## 今後
 
 ロードマップは [docs/roadmap.md](docs/roadmap.md) にあります。
 
-今後は、より賢い encoder planning、chunking、dictionary、domain-specific codec、
-そして圧縮とは分離した authenticated sealing / encryption track を追加していく予定です。
+今後は、より賢い encoder planning、物理的な chunked container、dictionary、
+domain-specific codec、そして圧縮とは分離した authenticated sealing /
+encryption track を追加していく予定です。
 
 ## 名前について
 

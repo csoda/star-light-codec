@@ -9,10 +9,12 @@ import pytest
 from starlight_codec.codec import (
     MAGIC_SLB1,
     StarLightCodecError,
+    create_capsule_file,
     decode_file,
     decode_slb1,
     encode_file,
     encode_slb1,
+    hydrate_file,
     inspect_slb1,
 )
 
@@ -136,3 +138,77 @@ def test_top_level_data_is_rejected_before_metadata_echo() -> None:
 
     with pytest.raises(StarLightCodecError):
         decode_slb1(tampered)
+
+
+def test_capsule_manifest_and_chunk_hydration(tmp_path: Path) -> None:
+    data = b"alpha-" * 300 + b"beta-" * 300 + b"gamma-" * 300
+    source = tmp_path / "source.bin"
+    artifact = tmp_path / "source.slb1"
+    capsule = tmp_path / "source.capsule.json"
+    output = tmp_path / "chunk.bin"
+    source.write_bytes(data)
+
+    meta = create_capsule_file(
+        source,
+        artifact,
+        capsule,
+        max_passes=2,
+        summary="Synthetic fixture for LLM transport.",
+        tags=["transport", "codec-test", "transport"],
+        chunk_size=512,
+    )
+    capsule_doc = json.loads(capsule.read_text(encoding="utf-8"))
+    capsule_text = capsule.read_text(encoding="utf-8")
+
+    assert meta["action"] == "capsule"
+    assert meta["chunkCount"] > 1
+    assert capsule_doc["kind"] == "slc-llm-transport"
+    assert capsule_doc["artifactRef"] == "source.slb1"
+    assert capsule_doc["semanticTags"] == ["codec-test", "transport"]
+    assert "alpha-alpha-alpha" not in capsule_text
+
+    chunk = capsule_doc["chunkIndex"][1]
+    hydrate_meta = hydrate_file(capsule, output, chunk_id=chunk["chunkId"])
+
+    assert hydrate_meta["hydrateMode"] == "chunk"
+    assert output.read_bytes() == data[chunk["start"] : chunk["end"]]
+
+
+def test_direct_range_hydration(tmp_path: Path) -> None:
+    data = b"0123456789abcdef"
+    source = tmp_path / "source.bin"
+    artifact = tmp_path / "source.slb1"
+    output = tmp_path / "range.bin"
+    source.write_bytes(data)
+    encode_file(source, artifact, max_passes=1)
+
+    meta = hydrate_file(artifact, output, byte_range="4:10")
+
+    assert meta["hydrateMode"] == "range"
+    assert output.read_bytes() == b"456789"
+
+
+def test_invalid_hydration_range_fails_closed(tmp_path: Path) -> None:
+    source = tmp_path / "source.bin"
+    artifact = tmp_path / "source.slb1"
+    output = tmp_path / "range.bin"
+    source.write_bytes(b"small")
+    encode_file(source, artifact, max_passes=1)
+
+    with pytest.raises(StarLightCodecError):
+        hydrate_file(artifact, output, byte_range="3:99")
+
+
+def test_capsule_chunk_digest_mismatch_fails_closed(tmp_path: Path) -> None:
+    source = tmp_path / "source.bin"
+    artifact = tmp_path / "source.slb1"
+    capsule = tmp_path / "source.capsule.json"
+    output = tmp_path / "chunk.bin"
+    source.write_bytes(b"chunk-digest-fixture" * 200)
+    create_capsule_file(source, artifact, capsule, max_passes=2, chunk_size=128)
+    capsule_doc = json.loads(capsule.read_text(encoding="utf-8"))
+    capsule_doc["chunkIndex"][0]["digest"] = "sha256:" + ("0" * 64)
+    capsule.write_text(json.dumps(capsule_doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    with pytest.raises(StarLightCodecError):
+        hydrate_file(capsule, output, chunk_id="c0001")

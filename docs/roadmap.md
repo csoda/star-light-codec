@@ -15,7 +15,19 @@ Status: active.
 - Avoid adopting compressed artifacts when the whole artifact is larger than the
   source.
 
-## R2. Stronger Encoder Planning
+## R2. LLM Transport Capsules
+
+Status: active.
+
+- Keep compressed bytes opaque to LLMs.
+- Use transport capsules for artifact refs, semantic tags, stable summaries, and
+  chunk indexes.
+- Hydrate exact bytes through tools instead of asking models to decompress or
+  generate compressed payloads.
+- Add token/quality/cache benchmarks for raw prompt vs gzip/base64 prompt vs
+  capsule-only vs capsule-plus-hydration workflows.
+
+## R3. Stronger Encoder Planning
 
 Status: planned.
 
@@ -25,7 +37,7 @@ Status: planned.
 - Add a no-benefit fast path for random or already-compressed data.
 - Keep decoder-compatible transforms stable where possible.
 
-## R3. Chunking And Dictionaries
+## R4. Chunking And Dictionaries
 
 Status: planned.
 
@@ -34,7 +46,7 @@ Status: planned.
 - Add small local dictionaries for repeated JSON keys, logs, and project memory.
 - Add Merkle-style chunk digests for partial validation and dedupe.
 
-## R4. Domain-Specific Codecs
+## R5. Domain-Specific Codecs
 
 Status: planned.
 
@@ -44,7 +56,7 @@ Status: planned.
 - Game-development artifacts where human judgment can choose useful lossy
   representations.
 
-## R5. Authenticated Sealing
+## R6. Authenticated Sealing
 
 Status: planned.
 
@@ -56,7 +68,7 @@ The Star Light prototype already has a local experimental seal/open lane. This
 repository will only promote a seal format after a threat model and focused
 security review.
 
-## R6. Public Benchmarks
+## R7. Public Benchmarks
 
 Status: planned.
 
@@ -65,7 +77,7 @@ Status: planned.
   whether storage adoption is recommended.
 - Avoid claiming universal compression from small or hand-picked fixtures.
 
-## R7. Language Ports
+## R8. Language Ports
 
 Status: planned.
 

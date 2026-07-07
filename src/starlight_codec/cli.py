@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from .codec import decode_file, encode_file, inspect_slb1
+from .codec import create_capsule_file, decode_file, encode_file, hydrate_file, inspect_slb1
 
 
 def print_json(value: object) -> None:
@@ -27,6 +27,21 @@ def main(argv: list[str] | None = None) -> int:
     inspect = sub.add_parser("inspect", help="inspect an SLB1 artifact without decoding raw bytes")
     inspect.add_argument("input")
 
+    capsule = sub.add_parser("capsule", help="encode a file and write an LLM transport capsule")
+    capsule.add_argument("input")
+    capsule.add_argument("artifact")
+    capsule.add_argument("capsule")
+    capsule.add_argument("--max-passes", type=int, default=1)
+    capsule.add_argument("--summary", default="")
+    capsule.add_argument("--tag", action="append", default=[])
+    capsule.add_argument("--chunk-size", type=int, default=4096)
+
+    hydrate = sub.add_parser("hydrate", help="hydrate bytes from an SLB1 artifact or capsule")
+    hydrate.add_argument("input")
+    hydrate.add_argument("output")
+    hydrate.add_argument("--range", dest="byte_range")
+    hydrate.add_argument("--chunk")
+
     args = parser.parse_args(argv)
     if args.command == "encode":
         print_json(encode_file(args.input, args.output, max_passes=args.max_passes))
@@ -36,6 +51,22 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "inspect":
         print_json(inspect_slb1(Path(args.input).read_bytes()))
+        return 0
+    if args.command == "capsule":
+        print_json(
+            create_capsule_file(
+                args.input,
+                args.artifact,
+                args.capsule,
+                max_passes=args.max_passes,
+                summary=args.summary,
+                tags=args.tag,
+                chunk_size=args.chunk_size,
+            )
+        )
+        return 0
+    if args.command == "hydrate":
+        print_json(hydrate_file(args.input, args.output, byte_range=args.byte_range, chunk_id=args.chunk))
         return 0
     parser.error("unknown command")
     return 2

@@ -24,5 +24,12 @@ The reference decoder is expected to fail closed on malformed `SLB1` artifacts:
   transform depth.
 - Formal side-channel analysis.
 
+## Capsule Manifests
+
+LLM transport capsules are metadata manifests. They must not embed raw source
+bytes or package payloads. `artifactRef` is expected to be a relative local
+reference, and hydration verifies the referenced artifact digest before writing
+decoded bytes.
+
 Future sealed artifacts should be developed under an explicit threat model and
 should use well-reviewed cryptographic primitives.
