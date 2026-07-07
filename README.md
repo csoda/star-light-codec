@@ -15,6 +15,7 @@ The current public slice is deliberately narrow:
 - exact round-trip for arbitrary byte files;
 - a compact `SLB1` binary artifact container;
 - bounded gzip transform planning;
+- an optional experimental predictive residual model layer;
 - SHA-256 validation for the payload and original input;
 - storage-adoption metadata so incompressible data can stay uncompressed;
 - a compatibility profile for Star Light's `starlight-byte-exact` artifacts;
@@ -83,8 +84,8 @@ The header records the compatibility profile:
 - `packageKind: starlight-byte-exact`
 - `artifactContainer: slb1`
 - `packageFormat: layered`
-- `strategy: stored-base64 | gzip-base64 | gzip-recursive-base64`
-- `transforms: [] | ["gzip"] | ["gzip", ...]`
+- `strategy: stored-base64 | gzip-base64 | gzip-recursive-base64 | delta-prev-*`
+- `transforms: [] | ["gzip"] | ["delta-prev-v1", "gzip", ...]`
 - `inputDigest` and `payloadDigest` as `sha256:<64 hex>`
 
 The payload is not embedded in JSON. It is stored as raw bytes after the header,
@@ -97,7 +98,7 @@ See [docs/spec.md](docs/spec.md) for the exact format contract.
 - Not a replacement for gzip, zstd, Brotli, PNG, MP3, Opus, or other mature
   codecs.
 - Not a claim of universal compression.
-- Not a machine-learning compressor.
+- Not a neural machine-learning compressor.
 - Not a production security system.
 - Not a codec pack for playing media files.
 
@@ -119,6 +120,27 @@ The reference encoder uses a bounded transform planner:
 
 This is a baseline, not the ceiling. The roadmap is to make the encoder smarter
 while keeping exact round-trip and fail-closed decode behavior as the invariant.
+
+## Experimental Model Layer
+
+Star Light Codec can also try a small deterministic prediction model before
+compression:
+
+```powershell
+python -m starlight_codec encode input.bin input.slb1 --model auto
+python -m starlight_codec capsule input.bin input.slb1 input.capsule.json --model auto
+```
+
+The first model is `delta-prev-v1`. It predicts each byte from the previous
+byte, stores the byte-wise residual, then lets the normal bounded gzip planner
+compress that residual. This is not a neural compressor and it is not lossy:
+the model id, model hash, transform stack, payload digest, and final input
+digest are all stored so decode remains exact and fail-closed.
+
+`--model auto` compares the baseline encoder with the modeled encoder and keeps
+the modeled artifact only when the whole `SLB1` artifact is smaller. The default
+is still `--model none` for maximum compatibility with the baseline `SLB1`
+contract.
 
 ## LLM Transport Capsules
 
@@ -168,9 +190,9 @@ domain-specific residual codecs, and a separate authenticated sealing layer.
 ## Benchmarks
 
 Synthetic local benchmark results are in [BENCHMARKS.md](BENCHMARKS.md).
-The current baseline compares raw bytes, gzip, gzip+base64, `SLB1`, and
-LLM-facing capsule manifests across redundant text, JSON logs, random bytes, and
-already-compressed input.
+The current baseline compares raw bytes, gzip, gzip+base64, `SLB1`,
+`--model auto`, and LLM-facing capsule manifests across redundant text, JSON
+logs, ramp bytes, random bytes, and already-compressed input.
 
 ## Name Check
 

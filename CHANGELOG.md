@@ -9,6 +9,8 @@
   vectors, and benchmark result data are CC0-1.0.
 - Added a synthetic transport benchmark for raw bytes, gzip, gzip+base64, SLB1,
   capsule manifests, and chunk hydration.
+- Added an experimental deterministic `delta-prev-v1` predictive residual model
+  with `--model auto` selection.
 
 ## 0.1.0
 

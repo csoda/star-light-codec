@@ -140,6 +140,92 @@ def test_top_level_data_is_rejected_before_metadata_echo() -> None:
         decode_slb1(tampered)
 
 
+def test_delta_prev_model_round_trips_and_records_model() -> None:
+    data = bytes((index * 3) % 256 for index in range(8192))
+    encoded = encode_slb1(data, max_passes=2, model="delta-prev-v1")
+
+    assert encoded.metadata["selectedModel"] == "delta-prev-v1"
+    assert encoded.metadata["predictionModel"]["modelId"] == "delta-prev-v1"
+    assert encoded.metadata["strategy"] == "delta-prev-gzip-base64"
+    assert encoded.metadata["transforms"] == ["delta-prev-v1", "gzip"]
+    assert encoded.metadata["payloadBytes"] < len(data)
+    assert decode_slb1(encoded.artifact).data == data
+
+
+def test_auto_model_selects_delta_when_it_wins() -> None:
+    data = bytes((index * 3) % 256 for index in range(8192))
+    encoded = encode_slb1(data, max_passes=2, model="auto")
+
+    assert encoded.metadata["selectedModel"] == "delta-prev-v1"
+    assert decode_slb1(encoded.artifact).data == data
+
+
+def test_auto_model_compares_whole_artifact_size() -> None:
+    data = bytes((index * 3) % 256 for index in range(24))
+    baseline = encode_slb1(data, max_passes=2, model="none")
+    modeled = encode_slb1(data, max_passes=2, model="delta-prev-v1")
+    encoded = encode_slb1(data, max_passes=2, model="auto")
+
+    assert modeled.metadata["payloadBytes"] < baseline.metadata["payloadBytes"]
+    assert len(modeled.artifact) > len(baseline.artifact)
+    assert encoded.metadata["selectedModel"] == "none"
+    assert encoded.artifact == baseline.artifact
+    assert decode_slb1(encoded.artifact).data == data
+
+
+def test_unsupported_model_is_rejected() -> None:
+    with pytest.raises(StarLightCodecError):
+        encode_slb1(b"abc", model="tiny-transformer")
+
+
+def test_prediction_model_hash_mismatch_fails_closed() -> None:
+    encoded = encode_slb1(
+        bytes((index * 3) % 256 for index in range(1024)),
+        max_passes=2,
+        model="delta-prev-v1",
+    )
+    header_len = int.from_bytes(encoded.artifact[4:8], "little")
+    payload_len = int.from_bytes(encoded.artifact[8:16], "little")
+    header = json.loads(encoded.artifact[16 : 16 + header_len].decode("utf-8"))
+    header["predictionModel"]["modelHash"] = "sha256:" + ("0" * 64)
+    header_bytes = json.dumps(header, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    payload = encoded.artifact[16 + header_len :]
+    tampered = (
+        MAGIC_SLB1
+        + len(header_bytes).to_bytes(4, "little")
+        + payload_len.to_bytes(8, "little")
+        + header_bytes
+        + payload
+    )
+
+    with pytest.raises(StarLightCodecError):
+        decode_slb1(tampered)
+
+
+def test_invalid_prediction_model_metadata_fails_closed() -> None:
+    encoded = encode_slb1(
+        bytes((index * 3) % 256 for index in range(1024)),
+        max_passes=2,
+        model="delta-prev-v1",
+    )
+    header_len = int.from_bytes(encoded.artifact[4:8], "little")
+    payload_len = int.from_bytes(encoded.artifact[8:16], "little")
+    header = json.loads(encoded.artifact[16 : 16 + header_len].decode("utf-8"))
+    header["predictionModel"] = "delta-prev-v1"
+    header_bytes = json.dumps(header, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    payload = encoded.artifact[16 + header_len :]
+    tampered = (
+        MAGIC_SLB1
+        + len(header_bytes).to_bytes(4, "little")
+        + payload_len.to_bytes(8, "little")
+        + header_bytes
+        + payload
+    )
+
+    with pytest.raises(StarLightCodecError):
+        decode_slb1(tampered)
+
+
 def test_capsule_manifest_and_chunk_hydration(tmp_path: Path) -> None:
     data = b"alpha-" * 300 + b"beta-" * 300 + b"gamma-" * 300
     source = tmp_path / "source.bin"
