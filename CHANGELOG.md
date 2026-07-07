@@ -7,6 +7,8 @@
 - Documented the rule that compressed bytes are opaque to LLMs.
 - Clarified that codec formats, schemas, interoperability specs, fixtures, test
   vectors, and benchmark result data are CC0-1.0.
+- Added a synthetic transport benchmark for raw bytes, gzip, gzip+base64, SLB1,
+  capsule manifests, and chunk hydration.
 
 ## 0.1.0
 

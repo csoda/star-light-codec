@@ -165,6 +165,13 @@ The roadmap is in [docs/roadmap.md](docs/roadmap.md). The next planned tracks
 are smarter encoder planning, physical chunked containers, dictionaries,
 domain-specific residual codecs, and a separate authenticated sealing layer.
 
+## Benchmarks
+
+Synthetic local benchmark results are in [BENCHMARKS.md](BENCHMARKS.md).
+The current baseline compares raw bytes, gzip, gzip+base64, `SLB1`, and
+LLM-facing capsule manifests across redundant text, JSON logs, random bytes, and
+already-compressed input.
+
 ## Name Check
 
 The project name is **Star Light Codec**. A quick public search found nearby

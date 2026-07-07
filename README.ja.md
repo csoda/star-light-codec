@@ -103,6 +103,13 @@ hydrate します。
 domain-specific codec、そして圧縮とは分離した authenticated sealing /
 encryption track を追加していく予定です。
 
+## ベンチマーク
+
+synthetic local benchmark は [BENCHMARKS.md](BENCHMARKS.md) にあります。
+現在のbaselineでは、raw bytes、gzip、gzip+base64、`SLB1`、LLM向けcapsule
+manifestを、重複text、JSON logs、random bytes、already-compressed inputで
+比較しています。
+
 ## 名前について
 
 公開名は **Star Light Codec** です。2026-07-07 時点の簡易調査では、
