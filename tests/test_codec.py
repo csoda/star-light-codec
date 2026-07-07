@@ -10,12 +10,14 @@ from starlight_codec.codec import (
     MAGIC_SLB1,
     StarLightCodecError,
     create_capsule_file,
+    create_capsule_pack_file,
     decode_file,
     decode_slb1,
     encode_file,
     encode_slb1,
     hydrate_file,
     inspect_slb1,
+    token_report_file,
 )
 
 
@@ -320,6 +322,101 @@ def test_capsule_manifest_and_chunk_hydration(tmp_path: Path) -> None:
 
     assert hydrate_meta["hydrateMode"] == "chunk"
     assert output.read_bytes() == data[chunk["start"] : chunk["end"]]
+
+
+def test_capsule_pack_recurses_without_raw_payload(tmp_path: Path) -> None:
+    secret = "SLC-SECRET-PAYLOAD-DO-NOT-PROMPT"
+    data = (secret + "\n").encode("utf-8") * 300
+    source = tmp_path / "source.txt"
+    artifact = tmp_path / "source.slb1"
+    capsule = tmp_path / "source.capsule.json"
+    pack = tmp_path / "pack.capsule-pack.json"
+    nested = tmp_path / "nested.capsule-pack.json"
+    source.write_bytes(data)
+
+    create_capsule_file(source, artifact, capsule, max_passes=2, summary="Secret fixture.")
+    create_capsule_pack_file([capsule], pack, summary="Single fixture pack.", tags=["pack"])
+    create_capsule_pack_file([pack], nested, summary="Nested fixture pack.")
+
+    capsule_text = capsule.read_text(encoding="utf-8")
+    pack_text = pack.read_text(encoding="utf-8")
+    nested_doc = json.loads(nested.read_text(encoding="utf-8"))
+
+    assert secret not in capsule_text
+    assert secret not in pack_text
+    assert nested_doc["kind"] == "slc-llm-transport-pack"
+    assert nested_doc["items"][0]["kind"] == "pack"
+    assert nested_doc["items"][0]["packRef"] == "pack.capsule-pack.json"
+    assert "chunkIndex" not in pack_text
+    assert nested_doc["tokenEstimate"]["noRawPayload"] is True
+
+
+def test_token_report_compares_raw_base64_to_capsule_pack(tmp_path: Path) -> None:
+    data = b"token-report-fixture-" * 500
+    source = tmp_path / "source.bin"
+    artifact = tmp_path / "source.slb1"
+    capsule = tmp_path / "source.capsule.json"
+    pack = tmp_path / "pack.capsule-pack.json"
+    source.write_bytes(data)
+
+    create_capsule_file(source, artifact, capsule, max_passes=2, summary="Token report fixture.")
+    create_capsule_pack_file([capsule], pack)
+
+    raw_report = token_report_file(source)
+    capsule_report = token_report_file(capsule)
+    pack_report = token_report_file(pack)
+
+    assert raw_report["rawBase64PromptTokens"] > 0
+    assert raw_report["noRawPayload"] is False
+    assert capsule_report["sourceKind"] == "slc-llm-transport"
+    assert capsule_report["noRawPayload"] is True
+    assert capsule_report["compactPromptTokens"] > 0
+    assert "estimatedTokensSavedVsBase64" in capsule_report
+    assert pack_report["sourceKind"] == "slc-llm-transport-pack"
+    assert pack_report["compactKind"] == "capsule-pack"
+    assert pack_report["estimatedReductionRatioVsBase64"] >= 0
+
+
+def test_token_report_rejects_transport_json_with_raw_payload_fields(tmp_path: Path) -> None:
+    malformed = tmp_path / "malformed.capsule.json"
+    malformed.write_text(
+        json.dumps(
+            {
+                "schemaVersion": 1,
+                "kind": "slc-llm-transport",
+                "artifactRef": "source.slb1",
+                "rawBytes": 12,
+                "nested": {"payload": "raw bytes must not be prompted"},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(StarLightCodecError):
+        token_report_file(malformed)
+
+
+def test_capsule_pack_rejects_direct_self_reference(tmp_path: Path) -> None:
+    pack = tmp_path / "self.capsule-pack.json"
+
+    with pytest.raises(StarLightCodecError):
+        create_capsule_pack_file([pack], pack)
+
+
+def test_capsule_pack_rejects_two_pack_cycle(tmp_path: Path) -> None:
+    data = b"cycle-fixture-" * 200
+    source = tmp_path / "source.bin"
+    artifact = tmp_path / "source.slb1"
+    capsule = tmp_path / "source.capsule.json"
+    pack_a = tmp_path / "a.capsule-pack.json"
+    pack_b = tmp_path / "b.capsule-pack.json"
+    source.write_bytes(data)
+    create_capsule_file(source, artifact, capsule, max_passes=2)
+    create_capsule_pack_file([capsule], pack_a)
+    create_capsule_pack_file([pack_a], pack_b)
+
+    with pytest.raises(StarLightCodecError):
+        create_capsule_pack_file([pack_b], pack_a)
 
 
 def test_direct_range_hydration(tmp_path: Path) -> None:

@@ -4,7 +4,15 @@ import argparse
 import json
 from pathlib import Path
 
-from .codec import create_capsule_file, decode_file, encode_file, hydrate_file, inspect_slb1
+from .codec import (
+    create_capsule_file,
+    create_capsule_pack_file,
+    decode_file,
+    encode_file,
+    hydrate_file,
+    inspect_slb1,
+    token_report_file,
+)
 
 
 def print_json(value: object) -> None:
@@ -39,6 +47,15 @@ def main(argv: list[str] | None = None) -> int:
     capsule.add_argument("--summary", default="")
     capsule.add_argument("--tag", action="append", default=[])
     capsule.add_argument("--chunk-size", type=int, default=4096)
+
+    capsule_pack = sub.add_parser("capsule-pack", help="write a recursive LLM capsule pack")
+    capsule_pack.add_argument("output")
+    capsule_pack.add_argument("input", nargs="+")
+    capsule_pack.add_argument("--summary", default="")
+    capsule_pack.add_argument("--tag", action="append", default=[])
+
+    token_report = sub.add_parser("token-report", help="estimate raw prompt tokens vs capsule prompt tokens")
+    token_report.add_argument("input", nargs="+")
 
     hydrate = sub.add_parser("hydrate", help="hydrate bytes from an SLB1 artifact or capsule")
     hydrate.add_argument("input")
@@ -78,6 +95,20 @@ def main(argv: list[str] | None = None) -> int:
                 chunk_size=args.chunk_size,
             )
         )
+        return 0
+    if args.command == "capsule-pack":
+        print_json(
+            create_capsule_pack_file(
+                args.input,
+                args.output,
+                summary=args.summary,
+                tags=args.tag,
+            )
+        )
+        return 0
+    if args.command == "token-report":
+        reports = [token_report_file(input_path) for input_path in args.input]
+        print_json(reports[0] if len(reports) == 1 else {"items": reports})
         return 0
     if args.command == "hydrate":
         print_json(hydrate_file(args.input, args.output, byte_range=args.byte_range, chunk_id=args.chunk))

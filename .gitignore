@@ -8,3 +8,6 @@ dist/
 build/
 *.slb1
 *.roundtrip.*
+benchmarks/results/*.log
+benchmarks/results/*-status.json
+benchmarks/results/*-history.jsonl

@@ -1,0 +1,185 @@
+{
+  "kind": "star-light-predictor-search-state",
+  "lastRun": {
+    "elapsedSeconds": 14.031,
+    "evaluatedCandidateCount": 32,
+    "fileCount": 23,
+    "searchMode": "adaptive",
+    "stoppedReason": "time-limit"
+  },
+  "modelState": {
+    "compressor:bz2": {
+      "averageReward": -92.867,
+      "count": 2443,
+      "score": -226872.898359
+    },
+    "compressor:gzip": {
+      "averageReward": -73.95,
+      "count": 2444,
+      "score": -180733.290517
+    },
+    "compressor:lzma": {
+      "averageReward": -69.898,
+      "count": 2445,
+      "score": -170899.514273
+    },
+    "compressor:zlib": {
+      "averageReward": -73.506,
+      "count": 2444,
+      "score": -179649.008058
+    },
+    "offset:delta-prev:1": {
+      "averageReward": -14.891,
+      "count": 816,
+      "score": -12150.6954
+    },
+    "offset:delta-prev:16": {
+      "averageReward": -200.584,
+      "count": 812,
+      "score": -162874.09975
+    },
+    "offset:delta-prev:2": {
+      "averageReward": -43.981,
+      "count": 816,
+      "score": -35888.255
+    },
+    "offset:delta-prev:4": {
+      "averageReward": -85.349,
+      "count": 815,
+      "score": -69559.5573
+    },
+    "offset:delta-prev:8": {
+      "averageReward": -140.379,
+      "count": 812,
+      "score": -113988.0315
+    },
+    "offset:xor-prev:1": {
+      "averageReward": -11.237,
+      "count": 816,
+      "score": -9169.17245
+    },
+    "offset:xor-prev:16": {
+      "averageReward": -170.118,
+      "count": 812,
+      "score": -138135.73005
+    },
+    "offset:xor-prev:2": {
+      "averageReward": -36.185,
+      "count": 816,
+      "score": -29526.99295
+    },
+    "offset:xor-prev:4": {
+      "averageReward": -72.607,
+      "count": 816,
+      "score": -59246.9711
+    },
+    "offset:xor-prev:8": {
+      "averageReward": -119.451,
+      "count": 813,
+      "score": -97113.68245
+    },
+    "pair:delta-avg2+bz2": {
+      "averageReward": -48.952,
+      "count": 204,
+      "score": -9986.12415
+    },
+    "pair:delta-avg2+gzip": {
+      "averageReward": -39.476,
+      "count": 204,
+      "score": -8053.06445
+    },
+    "pair:delta-avg2+lzma": {
+      "averageReward": -35.475,
+      "count": 204,
+      "score": -7236.83085
+    },
+    "pair:delta-avg2+zlib": {
+      "averageReward": -38.969,
+      "count": 204,
+      "score": -7949.6585
+    },
+    "pair:delta-prev+bz2": {
+      "averageReward": -114.487,
+      "count": 1017,
+      "score": -116433.2476
+    },
+    "pair:delta-prev+gzip": {
+      "averageReward": -92.935,
+      "count": 1018,
+      "score": -94608.0567
+    },
+    "pair:delta-prev+lzma": {
+      "averageReward": -87.665,
+      "count": 1018,
+      "score": -89242.6589
+    },
+    "pair:delta-prev+zlib": {
+      "averageReward": -92.511,
+      "count": 1018,
+      "score": -94176.67575
+    },
+    "pair:identity+bz2": {
+      "averageReward": 3.669,
+      "count": 204,
+      "score": 748.478986
+    },
+    "pair:identity+gzip": {
+      "averageReward": 3.05,
+      "count": 204,
+      "score": 622.201519
+    },
+    "pair:identity+lzma": {
+      "averageReward": 3.438,
+      "count": 204,
+      "score": 701.337778
+    },
+    "pair:identity+zlib": {
+      "averageReward": 3.197,
+      "count": 204,
+      "score": 652.136378
+    },
+    "pair:xor-prev+bz2": {
+      "averageReward": -99.413,
+      "count": 1018,
+      "score": -101202.0056
+    },
+    "pair:xor-prev+gzip": {
+      "averageReward": -77.303,
+      "count": 1018,
+      "score": -78694.3709
+    },
+    "pair:xor-prev+lzma": {
+      "averageReward": -73.721,
+      "count": 1019,
+      "score": -75121.3623
+    },
+    "pair:xor-prev+zlib": {
+      "averageReward": -76.793,
+      "count": 1018,
+      "score": -78174.8102
+    },
+    "transform:delta-avg2": {
+      "averageReward": -40.718,
+      "count": 816,
+      "score": -33225.67795
+    },
+    "transform:delta-prev": {
+      "averageReward": -96.895,
+      "count": 4071,
+      "score": -394460.63895
+    },
+    "transform:identity": {
+      "averageReward": 3.338,
+      "count": 816,
+      "score": 2724.154681
+    },
+    "transform:xor-prev": {
+      "averageReward": -81.805,
+      "count": 4073,
+      "score": -333192.549
+    }
+  },
+  "runCount": 204,
+  "schemaVersion": 1,
+  "updatedAtUtc": "2026-07-07T09:04:37+00:00"
+}

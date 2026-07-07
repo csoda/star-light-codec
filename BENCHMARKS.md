@@ -166,3 +166,18 @@ Current candidate families are deliberately simple and lossless:
 Promotion is mechanical: exact round-trip must pass, aggregate improvement must
 exceed the threshold, and worst regression must stay under the configured
 budget. Control candidates are marked `control-baseline`, not promoted.
+
+Current local background result:
+
+- Machine-readable summary:
+  [benchmarks/results/predictor-search-background-latest.json](benchmarks/results/predictor-search-background-latest.json)
+- Learned controller state:
+  [benchmarks/results/predictor-state.json](benchmarks/results/predictor-state.json)
+- Run shape: 204 bounded iterations, 23 files, 32 evaluated candidates in the
+  final slice.
+- Current best whole-corpus candidates were `identity+bz2` and `identity+lzma`,
+  both about 14% smaller than the previous `SLB1 --planner stdlib-auto --model
+  auto` baseline in this local run.
+- Predictor transforms such as `xor-prev` and `delta-prev` showed strong wins on
+  individual files, but they did not beat the whole-corpus promotion threshold
+  yet. Keep them in research, not the default production encoder.

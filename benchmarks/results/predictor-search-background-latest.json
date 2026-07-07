@@ -1,0 +1,1059 @@
+{
+  "baseline": "SLB1 --planner stdlib-auto --model auto",
+  "benchmark": "star-light-codec-predictor-search",
+  "candidateCount": 48,
+  "candidateLimit": 64,
+  "candidates": [
+    {
+      "aggregateImprovementPct": 0.0,
+      "baselineBytes": 0,
+      "bestFileGainPct": 0.0,
+      "candidate": "delta-prev-4+gzip",
+      "candidateBytes": 0,
+      "complete": false,
+      "compressor": "gzip",
+      "decision": "incomplete",
+      "encodeDecodeMedianMs": 0.0,
+      "evaluatedFiles": 0,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -406.266,
+      "transform": "delta-prev",
+      "worstRegressionPct": 0.0
+    },
+    {
+      "aggregateImprovementPct": -1.18,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 49.88,
+      "candidate": "xor-prev-1+lzma",
+      "candidateBytes": 66892,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 12.759,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 1
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -255.101,
+      "transform": "xor-prev",
+      "worstRegressionPct": 13.94
+    },
+    {
+      "aggregateImprovementPct": -2.17,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.8,
+      "candidate": "xor-prev-1+zlib",
+      "candidateBytes": 67549,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.315,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 1
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -260.609,
+      "transform": "xor-prev",
+      "worstRegressionPct": 23.38
+    },
+    {
+      "aggregateImprovementPct": -2.59,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 51.29,
+      "candidate": "xor-prev-1+gzip",
+      "candidateBytes": 67828,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.216,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 1
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -261.783,
+      "transform": "xor-prev",
+      "worstRegressionPct": 23.8
+    },
+    {
+      "aggregateImprovementPct": -3.52,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 49.42,
+      "candidate": "delta-prev-1+lzma",
+      "candidateBytes": 68444,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 16.055,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 1
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -293.904,
+      "transform": "delta-prev",
+      "worstRegressionPct": 16.04
+    },
+    {
+      "aggregateImprovementPct": -5.48,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.34,
+      "candidate": "delta-prev-1+zlib",
+      "candidateBytes": 69736,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.312,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 1
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -301.153,
+      "transform": "delta-prev",
+      "worstRegressionPct": 22.96
+    },
+    {
+      "aggregateImprovementPct": -5.9,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 50.82,
+      "candidate": "delta-prev-1+gzip",
+      "candidateBytes": 70015,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.348,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 1
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -302.318,
+      "transform": "delta-prev",
+      "worstRegressionPct": 23.38
+    },
+    {
+      "aggregateImprovementPct": -7.25,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.22,
+      "candidate": "xor-prev-1+bz2",
+      "candidateBytes": 70906,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.786,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 1
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -303.169,
+      "transform": "xor-prev",
+      "worstRegressionPct": 22.06
+    },
+    {
+      "aggregateImprovementPct": -8.77,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 51.75,
+      "candidate": "delta-prev-1+bz2",
+      "candidateBytes": 71911,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.96,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 1
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -343.07,
+      "transform": "delta-prev",
+      "worstRegressionPct": 18.45
+    },
+    {
+      "aggregateImprovementPct": -13.93,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 49.88,
+      "candidate": "xor-prev-2+lzma",
+      "candidateBytes": 75325,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 14.472,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 2
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -291.563,
+      "transform": "xor-prev",
+      "worstRegressionPct": 34.4
+    },
+    {
+      "aggregateImprovementPct": -14.85,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.8,
+      "candidate": "xor-prev-2+zlib",
+      "candidateBytes": 75931,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.195,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 2
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -297.077,
+      "transform": "xor-prev",
+      "worstRegressionPct": 37.7
+    },
+    {
+      "aggregateImprovementPct": -15.27,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 51.29,
+      "candidate": "xor-prev-2+gzip",
+      "candidateBytes": 76210,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.241,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 2
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -298.25,
+      "transform": "xor-prev",
+      "worstRegressionPct": 37.84
+    },
+    {
+      "aggregateImprovementPct": -16.44,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 50.82,
+      "candidate": "delta-avg2+lzma",
+      "candidateBytes": 76985,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 13.924,
+      "evaluatedFiles": 23,
+      "params": {},
+      "roundTripFailures": 0,
+      "selectionScore": -182.065,
+      "transform": "delta-avg2",
+      "worstRegressionPct": 37.6
+    },
+    {
+      "aggregateImprovementPct": -18.68,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 53.74,
+      "candidate": "delta-avg2+zlib",
+      "candidateBytes": 78463,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.955,
+      "evaluatedFiles": 23,
+      "params": {},
+      "roundTripFailures": 0,
+      "selectionScore": -187.973,
+      "transform": "delta-avg2",
+      "worstRegressionPct": 42.68
+    },
+    {
+      "aggregateImprovementPct": -19.1,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.22,
+      "candidate": "delta-avg2+gzip",
+      "candidateBytes": 78742,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.947,
+      "evaluatedFiles": 23,
+      "params": {},
+      "roundTripFailures": 0,
+      "selectionScore": -189.157,
+      "transform": "delta-avg2",
+      "worstRegressionPct": 42.83
+    },
+    {
+      "aggregateImprovementPct": -19.12,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 49.42,
+      "candidate": "delta-prev-2+lzma",
+      "candidateBytes": 78758,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 17.606,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 2
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -336.709,
+      "transform": "delta-prev",
+      "worstRegressionPct": 39.66
+    },
+    {
+      "aggregateImprovementPct": -20.01,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.34,
+      "candidate": "delta-prev-2+zlib",
+      "candidateBytes": 79343,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.32,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 2
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -343.944,
+      "transform": "delta-prev",
+      "worstRegressionPct": 43.27
+    },
+    {
+      "aggregateImprovementPct": -20.43,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 50.82,
+      "candidate": "delta-prev-2+gzip",
+      "candidateBytes": 79622,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.35,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 2
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -345.11,
+      "transform": "delta-prev",
+      "worstRegressionPct": 43.41
+    },
+    {
+      "aggregateImprovementPct": -25.76,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.22,
+      "candidate": "xor-prev-2+bz2",
+      "candidateBytes": 83146,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.885,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 2
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -339.63,
+      "transform": "xor-prev",
+      "worstRegressionPct": 46.97
+    },
+    {
+      "aggregateImprovementPct": -26.55,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 53.15,
+      "candidate": "delta-avg2+bz2",
+      "candidateBytes": 83671,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.64,
+      "evaluatedFiles": 23,
+      "params": {},
+      "roundTripFailures": 0,
+      "selectionScore": -217.941,
+      "transform": "delta-avg2",
+      "worstRegressionPct": 45.72
+    },
+    {
+      "aggregateImprovementPct": -30.87,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 51.75,
+      "candidate": "delta-prev-2+bz2",
+      "candidateBytes": 86522,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.049,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 2
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -385.848,
+      "transform": "delta-prev",
+      "worstRegressionPct": 50.34
+    },
+    {
+      "aggregateImprovementPct": -31.68,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 49.88,
+      "candidate": "xor-prev-4+lzma",
+      "candidateBytes": 87058,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 13.938,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -343.725,
+      "transform": "xor-prev",
+      "worstRegressionPct": 64.72
+    },
+    {
+      "aggregateImprovementPct": -34.16,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.8,
+      "candidate": "xor-prev-4+zlib",
+      "candidateBytes": 88699,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.196,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -349.24,
+      "transform": "xor-prev",
+      "worstRegressionPct": 69.42
+    },
+    {
+      "aggregateImprovementPct": -34.58,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 51.29,
+      "candidate": "xor-prev-4+gzip",
+      "candidateBytes": 88978,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.385,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -350.421,
+      "transform": "xor-prev",
+      "worstRegressionPct": 69.56
+    },
+    {
+      "aggregateImprovementPct": -39.36,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 49.42,
+      "candidate": "delta-prev-4+lzma",
+      "candidateBytes": 92138,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 13.379,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -397.837,
+      "transform": "delta-prev",
+      "worstRegressionPct": 73.13
+    },
+    {
+      "aggregateImprovementPct": -42.52,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.34,
+      "candidate": "delta-prev-4+zlib",
+      "candidateBytes": 94229,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.356,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -405.091,
+      "transform": "delta-prev",
+      "worstRegressionPct": 79.15
+    },
+    {
+      "aggregateImprovementPct": -48.63,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.22,
+      "candidate": "xor-prev-4+bz2",
+      "candidateBytes": 98264,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.97,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -391.806,
+      "transform": "xor-prev",
+      "worstRegressionPct": 89.27
+    },
+    {
+      "aggregateImprovementPct": -53.68,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 49.88,
+      "candidate": "xor-prev-8+lzma",
+      "candidateBytes": 101606,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 17.742,
+      "evaluatedFiles": 23,
+      "params": {
+        "offset": 8
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -406.172,
+      "transform": "xor-prev",
+      "worstRegressionPct": 109.85
+    },
+    {
+      "aggregateImprovementPct": 14.23,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 53.62,
+      "candidate": "identity+bz2",
+      "candidateBytes": 56706,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "control-baseline",
+      "encodeDecodeMedianMs": 0.685,
+      "evaluatedFiles": 23,
+      "params": {},
+      "roundTripFailures": 0,
+      "selectionScore": -91.009,
+      "transform": "identity",
+      "worstRegressionPct": -4.65
+    },
+    {
+      "aggregateImprovementPct": 14.22,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 51.29,
+      "candidate": "identity+lzma",
+      "candidateBytes": 56714,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "control-baseline",
+      "encodeDecodeMedianMs": 13.123,
+      "evaluatedFiles": 23,
+      "params": {},
+      "roundTripFailures": 0,
+      "selectionScore": -68.222,
+      "transform": "identity",
+      "worstRegressionPct": -4.35
+    },
+    {
+      "aggregateImprovementPct": 13.05,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 54.21,
+      "candidate": "identity+zlib",
+      "candidateBytes": 57488,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "control-baseline",
+      "encodeDecodeMedianMs": 0.136,
+      "evaluatedFiles": 23,
+      "params": {},
+      "roundTripFailures": 0,
+      "selectionScore": -72.083,
+      "transform": "identity",
+      "worstRegressionPct": 7.65
+    },
+    {
+      "aggregateImprovementPct": 12.63,
+      "baselineBytes": 66115,
+      "bestFileGainPct": 52.69,
+      "candidate": "identity+gzip",
+      "candidateBytes": 57766,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "control-baseline",
+      "encodeDecodeMedianMs": 0.149,
+      "evaluatedFiles": 23,
+      "params": {},
+      "roundTripFailures": 0,
+      "selectionScore": -72.709,
+      "transform": "identity",
+      "worstRegressionPct": 8.07
+    }
+  ],
+  "elapsedSeconds": 14.031,
+  "evaluatedCandidateCount": 32,
+  "fileCount": 23,
+  "inputState": {
+    "keys": 34,
+    "loaded": true,
+    "runCount": 203
+  },
+  "maxPasses": 2,
+  "modelState": {
+    "compressor:bz2": {
+      "averageReward": -92.867,
+      "count": 2443,
+      "score": -226872.898359
+    },
+    "compressor:gzip": {
+      "averageReward": -73.95,
+      "count": 2444,
+      "score": -180733.290517
+    },
+    "compressor:lzma": {
+      "averageReward": -69.898,
+      "count": 2445,
+      "score": -170899.514273
+    },
+    "compressor:zlib": {
+      "averageReward": -73.506,
+      "count": 2444,
+      "score": -179649.008058
+    },
+    "offset:delta-prev:1": {
+      "averageReward": -14.891,
+      "count": 816,
+      "score": -12150.6954
+    },
+    "offset:delta-prev:16": {
+      "averageReward": -200.584,
+      "count": 812,
+      "score": -162874.09975
+    },
+    "offset:delta-prev:2": {
+      "averageReward": -43.981,
+      "count": 816,
+      "score": -35888.255
+    },
+    "offset:delta-prev:4": {
+      "averageReward": -85.349,
+      "count": 815,
+      "score": -69559.5573
+    },
+    "offset:delta-prev:8": {
+      "averageReward": -140.379,
+      "count": 812,
+      "score": -113988.0315
+    },
+    "offset:xor-prev:1": {
+      "averageReward": -11.237,
+      "count": 816,
+      "score": -9169.17245
+    },
+    "offset:xor-prev:16": {
+      "averageReward": -170.118,
+      "count": 812,
+      "score": -138135.73005
+    },
+    "offset:xor-prev:2": {
+      "averageReward": -36.185,
+      "count": 816,
+      "score": -29526.99295
+    },
+    "offset:xor-prev:4": {
+      "averageReward": -72.607,
+      "count": 816,
+      "score": -59246.9711
+    },
+    "offset:xor-prev:8": {
+      "averageReward": -119.451,
+      "count": 813,
+      "score": -97113.68245
+    },
+    "pair:delta-avg2+bz2": {
+      "averageReward": -48.952,
+      "count": 204,
+      "score": -9986.12415
+    },
+    "pair:delta-avg2+gzip": {
+      "averageReward": -39.476,
+      "count": 204,
+      "score": -8053.06445
+    },
+    "pair:delta-avg2+lzma": {
+      "averageReward": -35.475,
+      "count": 204,
+      "score": -7236.83085
+    },
+    "pair:delta-avg2+zlib": {
+      "averageReward": -38.969,
+      "count": 204,
+      "score": -7949.6585
+    },
+    "pair:delta-prev+bz2": {
+      "averageReward": -114.487,
+      "count": 1017,
+      "score": -116433.2476
+    },
+    "pair:delta-prev+gzip": {
+      "averageReward": -92.935,
+      "count": 1018,
+      "score": -94608.0567
+    },
+    "pair:delta-prev+lzma": {
+      "averageReward": -87.665,
+      "count": 1018,
+      "score": -89242.6589
+    },
+    "pair:delta-prev+zlib": {
+      "averageReward": -92.511,
+      "count": 1018,
+      "score": -94176.67575
+    },
+    "pair:identity+bz2": {
+      "averageReward": 3.669,
+      "count": 204,
+      "score": 748.478986
+    },
+    "pair:identity+gzip": {
+      "averageReward": 3.05,
+      "count": 204,
+      "score": 622.201519
+    },
+    "pair:identity+lzma": {
+      "averageReward": 3.438,
+      "count": 204,
+      "score": 701.337778
+    },
+    "pair:identity+zlib": {
+      "averageReward": 3.197,
+      "count": 204,
+      "score": 652.136378
+    },
+    "pair:xor-prev+bz2": {
+      "averageReward": -99.413,
+      "count": 1018,
+      "score": -101202.0056
+    },
+    "pair:xor-prev+gzip": {
+      "averageReward": -77.303,
+      "count": 1018,
+      "score": -78694.3709
+    },
+    "pair:xor-prev+lzma": {
+      "averageReward": -73.721,
+      "count": 1019,
+      "score": -75121.3623
+    },
+    "pair:xor-prev+zlib": {
+      "averageReward": -76.793,
+      "count": 1018,
+      "score": -78174.8102
+    },
+    "transform:delta-avg2": {
+      "averageReward": -40.718,
+      "count": 816,
+      "score": -33225.67795
+    },
+    "transform:delta-prev": {
+      "averageReward": -96.895,
+      "count": 4071,
+      "score": -394460.63895
+    },
+    "transform:identity": {
+      "averageReward": 3.338,
+      "count": 816,
+      "score": 2724.154681
+    },
+    "transform:xor-prev": {
+      "averageReward": -81.805,
+      "count": 4073,
+      "score": -333192.549
+    }
+  },
+  "note": "Experimental local predictor search. No raw file contents are embedded in this result.",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.10",
+  "resultLicense": "CC0-1.0",
+  "schemaVersion": 1,
+  "scriptLicense": "Apache-2.0",
+  "searchMode": "adaptive",
+  "selectionTrace": [
+    {
+      "aggregateImprovementPct": 14.22,
+      "candidate": "identity+lzma",
+      "decision": "control-baseline",
+      "selectionScore": -68.222
+    },
+    {
+      "aggregateImprovementPct": 13.05,
+      "candidate": "identity+zlib",
+      "decision": "control-baseline",
+      "selectionScore": -72.083
+    },
+    {
+      "aggregateImprovementPct": 12.63,
+      "candidate": "identity+gzip",
+      "decision": "control-baseline",
+      "selectionScore": -72.709
+    },
+    {
+      "aggregateImprovementPct": 14.23,
+      "candidate": "identity+bz2",
+      "decision": "control-baseline",
+      "selectionScore": -91.009
+    },
+    {
+      "aggregateImprovementPct": -16.44,
+      "candidate": "delta-avg2+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -182.065
+    },
+    {
+      "aggregateImprovementPct": -18.68,
+      "candidate": "delta-avg2+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -187.973
+    },
+    {
+      "aggregateImprovementPct": -19.1,
+      "candidate": "delta-avg2+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -189.157
+    },
+    {
+      "aggregateImprovementPct": -26.55,
+      "candidate": "delta-avg2+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -217.941
+    },
+    {
+      "aggregateImprovementPct": -1.18,
+      "candidate": "xor-prev-1+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -255.101
+    },
+    {
+      "aggregateImprovementPct": -2.17,
+      "candidate": "xor-prev-1+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -260.609
+    },
+    {
+      "aggregateImprovementPct": -2.59,
+      "candidate": "xor-prev-1+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -261.783
+    },
+    {
+      "aggregateImprovementPct": -13.93,
+      "candidate": "xor-prev-2+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -291.563
+    },
+    {
+      "aggregateImprovementPct": -3.52,
+      "candidate": "delta-prev-1+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -293.904
+    },
+    {
+      "aggregateImprovementPct": -14.85,
+      "candidate": "xor-prev-2+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -297.077
+    },
+    {
+      "aggregateImprovementPct": -15.27,
+      "candidate": "xor-prev-2+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -298.25
+    },
+    {
+      "aggregateImprovementPct": -5.48,
+      "candidate": "delta-prev-1+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -301.153
+    },
+    {
+      "aggregateImprovementPct": -5.9,
+      "candidate": "delta-prev-1+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -302.318
+    },
+    {
+      "aggregateImprovementPct": -7.25,
+      "candidate": "xor-prev-1+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -303.169
+    },
+    {
+      "aggregateImprovementPct": -19.12,
+      "candidate": "delta-prev-2+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -336.709
+    },
+    {
+      "aggregateImprovementPct": -25.76,
+      "candidate": "xor-prev-2+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -339.63
+    },
+    {
+      "aggregateImprovementPct": -8.77,
+      "candidate": "delta-prev-1+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -343.07
+    },
+    {
+      "aggregateImprovementPct": -31.68,
+      "candidate": "xor-prev-4+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -343.725
+    },
+    {
+      "aggregateImprovementPct": -20.01,
+      "candidate": "delta-prev-2+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -343.944
+    },
+    {
+      "aggregateImprovementPct": -20.43,
+      "candidate": "delta-prev-2+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -345.11
+    },
+    {
+      "aggregateImprovementPct": -34.16,
+      "candidate": "xor-prev-4+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -349.24
+    },
+    {
+      "aggregateImprovementPct": -34.58,
+      "candidate": "xor-prev-4+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -350.421
+    },
+    {
+      "aggregateImprovementPct": -30.87,
+      "candidate": "delta-prev-2+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -385.848
+    },
+    {
+      "aggregateImprovementPct": -48.63,
+      "candidate": "xor-prev-4+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -391.806
+    },
+    {
+      "aggregateImprovementPct": -39.36,
+      "candidate": "delta-prev-4+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -397.837
+    },
+    {
+      "aggregateImprovementPct": -42.52,
+      "candidate": "delta-prev-4+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -405.091
+    },
+    {
+      "aggregateImprovementPct": -53.68,
+      "candidate": "xor-prev-8+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -406.172
+    },
+    {
+      "aggregateImprovementPct": 0.0,
+      "candidate": "delta-prev-4+gzip",
+      "decision": "incomplete",
+      "selectionScore": -406.266
+    }
+  ],
+  "skipped": [
+    {
+      "path": "src/star_light_codec.egg-info/dependency_links.txt",
+      "reason": "excluded"
+    },
+    {
+      "path": "src/star_light_codec.egg-info/entry_points.txt",
+      "reason": "excluded"
+    },
+    {
+      "path": "src/star_light_codec.egg-info/PKG-INFO",
+      "reason": "excluded"
+    },
+    {
+      "path": "src/star_light_codec.egg-info/requires.txt",
+      "reason": "excluded"
+    },
+    {
+      "path": "src/star_light_codec.egg-info/SOURCES.txt",
+      "reason": "excluded"
+    },
+    {
+      "path": "src/star_light_codec.egg-info/top_level.txt",
+      "reason": "excluded"
+    },
+    {
+      "path": "src/starlight_codec/__pycache__/cli.cpython-312.pyc",
+      "reason": "excluded"
+    },
+    {
+      "path": "src/starlight_codec/__pycache__/codec.cpython-312.pyc",
+      "reason": "excluded"
+    },
+    {
+      "path": "src/starlight_codec/__pycache__/__init__.cpython-312.pyc",
+      "reason": "excluded"
+    },
+    {
+      "path": "src/starlight_codec/__pycache__/__main__.cpython-312.pyc",
+      "reason": "excluded"
+    },
+    {
+      "path": "tests/__pycache__/test_codec.cpython-312-pytest-9.1.1.pyc",
+      "reason": "excluded"
+    },
+    {
+      "path": "tests/__pycache__/test_real_data_benchmark.cpython-312-pytest-9.1.1.pyc",
+      "reason": "excluded"
+    },
+    {
+      "path": "tests/__pycache__/test_search_predictors.cpython-312-pytest-9.1.1.pyc",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/__pycache__/benchmark_real_data.cpython-312.pyc",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/__pycache__/benchmark_transport.cpython-312.pyc",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/__pycache__/search_predictors.cpython-312.pyc",
+      "reason": "excluded"
+    }
+  ],
+  "stateOutput": {
+    "keys": 34,
+    "written": true
+  },
+  "stateOutputRequested": true,
+  "stoppedReason": "time-limit",
+  "thresholds": {
+    "maxWorstRegressionPct": 2.0,
+    "minImprovementPct": 1.0
+  },
+  "timeLimitSeconds": 14.0
+}

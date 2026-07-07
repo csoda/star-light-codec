@@ -41,6 +41,8 @@ python -m starlight_codec encode README.md README.slb1 --max-passes 2
 python -m starlight_codec inspect README.slb1
 python -m starlight_codec decode README.slb1 README.roundtrip.md
 python -m starlight_codec capsule README.md README.slb1 README.capsule.json --tag docs
+python -m starlight_codec capsule-pack README.pack.json README.capsule.json --summary "Docs pack"
+python -m starlight_codec token-report README.capsule.json README.pack.json
 python -m starlight_codec hydrate README.capsule.json README.chunk.md --chunk c0001
 pytest
 ```
@@ -179,6 +181,37 @@ embed raw bytes or base64 payloads. Hydration is performed by the tool layer so
 the model can reason over metadata and request exact bytes only when needed.
 
 See [docs/llm-transport.md](docs/llm-transport.md).
+
+### Capsule Packs And Token Reports
+
+Byte compression and prompt-token reduction are related but different jobs.
+`SLB1` helps storage and exact hydration by keeping transformed bytes in an
+artifact. Capsules and capsule packs help prompts by giving the LLM only compact
+metadata, references, summaries, tags, digests, sizes, and hydration affordances.
+They intentionally do not embed raw bytes, transformed payload bytes, or base64.
+
+Use `capsule-pack` to group one or more capsule documents, or to recursively
+reference another pack:
+
+```powershell
+python -m starlight_codec capsule-pack project.pack.json `
+  README.capsule.json docs.capsule.json `
+  --summary "Documentation capsules"
+
+python -m starlight_codec capsule-pack workspace.pack.json project.pack.json
+```
+
+Use `token-report` for a rough prompt-cost comparison. It reports raw text
+tokens when UTF-8 text can be read, base64-ish raw byte prompt tokens, compact
+capsule or pack prompt tokens, and estimated savings:
+
+```powershell
+python -m starlight_codec token-report README.md README.capsule.json project.pack.json
+```
+
+The estimate is deliberately approximate and tokenizer-independent. It is meant
+to show when the model should reason over recursive capsules and request
+hydration for exact bytes only when needed, not to benchmark compression ratio.
 
 ## Example Metadata
 

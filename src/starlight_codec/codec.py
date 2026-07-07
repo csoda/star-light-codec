@@ -53,8 +53,81 @@ class CapsuleResult:
     artifact: bytes
 
 
+@dataclass(frozen=True)
+class CapsulePackResult:
+    metadata: dict[str, Any]
+    pack: dict[str, Any]
+
+
 def sha256_digest(data: bytes) -> str:
     return "sha256:" + hashlib.sha256(data).hexdigest()
+
+
+def estimate_prompt_tokens(text: str) -> int:
+    if not text:
+        return 0
+    return max(1, (len(text) + 3) // 4)
+
+
+def estimate_base64_prompt_tokens(byte_count: int) -> int:
+    if byte_count <= 0:
+        return 0
+    base64_chars = 4 * ((int(byte_count) + 2) // 3)
+    return estimate_prompt_tokens("x" * base64_chars)
+
+
+def _json_prompt_tokens(value: dict[str, Any]) -> int:
+    compact_json = json.dumps(value, separators=(",", ":"), sort_keys=True)
+    return estimate_prompt_tokens(compact_json)
+
+
+def _raw_text_prompt_tokens(data: bytes) -> int | None:
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        return None
+    return estimate_prompt_tokens(text)
+
+
+def _token_savings(raw_tokens: int, compact_tokens: int) -> dict[str, Any]:
+    saved = max(0, raw_tokens - compact_tokens)
+    ratio = round(compact_tokens / raw_tokens, 4) if raw_tokens else 0
+    return {
+        "estimatedTokensSavedVsBase64": saved,
+        "estimatedReductionRatioVsBase64": ratio,
+    }
+
+
+def token_estimate_for_bytes(data: bytes) -> dict[str, Any]:
+    raw_base64_tokens = estimate_base64_prompt_tokens(len(data))
+    raw_text_tokens = _raw_text_prompt_tokens(data)
+    return {
+        "kind": "raw-bytes",
+        "rawBytes": len(data),
+        "rawTextPromptTokens": raw_text_tokens,
+        "rawBase64PromptTokens": raw_base64_tokens,
+        "compactPromptTokens": raw_base64_tokens,
+        "compactKind": "raw-base64",
+        "noRawPayload": False,
+        **_token_savings(raw_base64_tokens, raw_base64_tokens),
+    }
+
+
+def token_estimate_for_document(document: dict[str, Any]) -> dict[str, Any]:
+    kind = str(document.get("kind", "json-document"))
+    raw_bytes = int(document.get("rawBytesTotal", document.get("rawBytes", 0)))
+    compact_tokens = _json_prompt_tokens(document)
+    raw_base64_tokens = estimate_base64_prompt_tokens(raw_bytes)
+    return {
+        "kind": kind,
+        "rawBytes": raw_bytes,
+        "rawTextPromptTokens": None,
+        "rawBase64PromptTokens": raw_base64_tokens,
+        "compactPromptTokens": compact_tokens,
+        "compactKind": "capsule-pack" if kind == "slc-llm-transport-pack" else "capsule",
+        "noRawPayload": True,
+        **_token_savings(raw_base64_tokens, compact_tokens),
+    }
 
 
 def classify(data: bytes) -> str:
@@ -674,6 +747,231 @@ def create_capsule_file(
     artifact_target.write_bytes(result.artifact)
     capsule_target.write_text(json.dumps(result.capsule, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return result.metadata
+
+
+def _relative_json_ref(source_path: Path, output_path: Path) -> str:
+    base = output_path.parent if output_path.parent != Path("") else Path(".")
+    return os.path.relpath(source_path, base).replace("\\", "/")
+
+
+def _pack_item_from_capsule(capsule_path: Path, output_path: Path, capsule: dict[str, Any], index: int) -> dict[str, Any]:
+    chunk_index = capsule.get("chunkIndex", [])
+    chunk_count = len(chunk_index) if isinstance(chunk_index, list) else 0
+    return {
+        "itemId": f"i{index:04d}",
+        "kind": "capsule",
+        "capsuleRef": _relative_json_ref(capsule_path, output_path),
+        "artifactRef": capsule.get("artifactRef", ""),
+        "artifactDigest": capsule.get("artifactDigest", ""),
+        "artifactBytes": int(capsule.get("artifactBytes", 0)),
+        "rawBytes": int(capsule.get("rawBytes", 0)),
+        "inputDigest": capsule.get("inputDigest", ""),
+        "classification": capsule.get("classification", ""),
+        "strategy": capsule.get("strategy", ""),
+        "selectedPlanner": capsule.get("selectedPlanner", ""),
+        "selectedModel": capsule.get("selectedModel", ""),
+        "summary": capsule.get("summary", ""),
+        "semanticTags": list(capsule.get("semanticTags", [])),
+        "chunkCount": chunk_count,
+        "hydrate": {
+            "tool": "slc hydrate",
+            "source": _relative_json_ref(capsule_path, output_path),
+            "supports": ["full", "range", "chunk"],
+        },
+    }
+
+
+def _pack_item_from_pack(pack_path: Path, output_path: Path, pack: dict[str, Any], index: int) -> dict[str, Any]:
+    items = pack.get("items", [])
+    item_count = len(items) if isinstance(items, list) else 0
+    return {
+        "itemId": f"i{index:04d}",
+        "kind": "pack",
+        "packRef": _relative_json_ref(pack_path, output_path),
+        "rawBytesTotal": int(pack.get("rawBytesTotal", 0)),
+        "artifactBytesTotal": int(pack.get("artifactBytesTotal", 0)),
+        "summary": pack.get("summary", ""),
+        "semanticTags": list(pack.get("semanticTags", [])),
+        "itemCount": item_count,
+    }
+
+
+FORBIDDEN_TRANSPORT_PAYLOAD_FIELDS = {
+    "base64Payload",
+    "bytes",
+    "data",
+    "payload",
+    "payloadBase64",
+    "rawPayload",
+}
+MAX_PACK_REFERENCE_DEPTH = 16
+
+
+def _validate_no_raw_payload_fields(value: Any) -> None:
+    if isinstance(value, dict):
+        if FORBIDDEN_TRANSPORT_PAYLOAD_FIELDS.intersection(value):
+            raise StarLightCodecError("Transport documents must not embed raw payload fields.")
+        for child in value.values():
+            _validate_no_raw_payload_fields(child)
+    elif isinstance(value, list):
+        for child in value:
+            _validate_no_raw_payload_fields(child)
+
+
+def _validate_transport_document(document: Any) -> dict[str, Any]:
+    if not isinstance(document, dict):
+        raise StarLightCodecError("Transport document must be a JSON object.")
+    try:
+        _validate_no_raw_payload_fields(document)
+    except RecursionError as exc:
+        raise StarLightCodecError("Transport documents must not embed raw payload fields.") from exc
+    kind = document.get("kind")
+    if kind not in ("slc-llm-transport", "slc-llm-transport-pack"):
+        raise StarLightCodecError("Unsupported transport document kind.")
+    if document.get("schemaVersion") != 1:
+        raise StarLightCodecError("Unsupported transport document schema version.")
+    return document
+
+
+def read_transport_document(path: str | Path) -> dict[str, Any]:
+    source_path = Path(path)
+    try:
+        document = json.loads(source_path.read_text(encoding="utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise StarLightCodecError("Transport document is not valid UTF-8 JSON.") from exc
+    return _validate_transport_document(document)
+
+
+def _resolve_pack_ref(pack_path: Path, pack_ref: str) -> Path:
+    if not pack_ref:
+        raise StarLightCodecError("Capsule pack item is missing packRef.")
+    if Path(pack_ref).is_absolute():
+        raise StarLightCodecError("Capsule pack references must be relative.")
+    return (pack_path.parent / pack_ref).resolve()
+
+
+def _validate_pack_reference_graph(
+    pack_path: Path,
+    output_path: Path,
+    visiting: set[Path],
+    visited: set[Path],
+    depth: int = 0,
+) -> None:
+    resolved_pack = pack_path.resolve()
+    resolved_output = output_path.resolve()
+    if resolved_pack == resolved_output:
+        raise StarLightCodecError("Capsule pack must not reference itself.")
+    if depth > MAX_PACK_REFERENCE_DEPTH:
+        raise StarLightCodecError("Capsule pack reference depth exceeds limit.")
+    if resolved_pack in visiting:
+        raise StarLightCodecError("Capsule pack reference cycle detected.")
+    if resolved_pack in visited:
+        return
+    document = read_transport_document(resolved_pack)
+    if document.get("kind") != "slc-llm-transport-pack":
+        visited.add(resolved_pack)
+        return
+    visiting.add(resolved_pack)
+    items = document.get("items", [])
+    if not isinstance(items, list):
+        raise StarLightCodecError("Capsule pack items must be a list.")
+    for item in items:
+        if not isinstance(item, dict):
+            raise StarLightCodecError("Capsule pack items must be objects.")
+        if item.get("kind") == "pack":
+            child_path = _resolve_pack_ref(resolved_pack, str(item.get("packRef", "")))
+            _validate_pack_reference_graph(child_path, resolved_output, visiting, visited, depth + 1)
+    visiting.remove(resolved_pack)
+    visited.add(resolved_pack)
+
+
+def _validate_capsule_pack_inputs(input_paths: list[str | Path], output_path: Path) -> None:
+    visited: set[Path] = set()
+    for input_path in input_paths:
+        source_path = Path(input_path).resolve()
+        if source_path == output_path.resolve():
+            raise StarLightCodecError("Capsule pack must not reference itself.")
+        _validate_pack_reference_graph(source_path, output_path, set(), visited)
+
+
+def create_capsule_pack(
+    input_paths: list[str | Path],
+    output_path: str | Path,
+    summary: str = "",
+    tags: list[str] | None = None,
+) -> CapsulePackResult:
+    pack_target = Path(output_path)
+    _validate_capsule_pack_inputs(input_paths, pack_target)
+    normalized_tags = sorted({tag.strip() for tag in (tags or []) if tag.strip()})
+    items: list[dict[str, Any]] = []
+    for index, input_path in enumerate(input_paths, start=1):
+        source_path = Path(input_path)
+        document = read_transport_document(source_path)
+        if document.get("kind") == "slc-llm-transport":
+            items.append(_pack_item_from_capsule(source_path, pack_target, document, index))
+        else:
+            items.append(_pack_item_from_pack(source_path, pack_target, document, index))
+    raw_bytes_total = sum(int(item.get("rawBytes", item.get("rawBytesTotal", 0))) for item in items)
+    artifact_bytes_total = sum(int(item.get("artifactBytes", item.get("artifactBytesTotal", 0))) for item in items)
+    pack = {
+        "schemaVersion": 1,
+        "kind": "slc-llm-transport-pack",
+        "summary": summary,
+        "semanticTags": normalized_tags,
+        "itemCount": len(items),
+        "rawBytesTotal": raw_bytes_total,
+        "artifactBytesTotal": artifact_bytes_total,
+        "items": items,
+        "hydrate": {
+            "tool": "slc hydrate",
+            "note": "Hydrate exact bytes from referenced capsules; packs do not embed payload bytes.",
+        },
+        "tokenEstimate": {},
+    }
+    pack["tokenEstimate"] = token_estimate_for_document(pack)
+    return CapsulePackResult(
+        metadata={
+            "action": "capsule-pack",
+            "kind": pack["kind"],
+            "itemCount": len(items),
+            "rawBytesTotal": raw_bytes_total,
+            "artifactBytesTotal": artifact_bytes_total,
+            "tokenEstimate": pack["tokenEstimate"],
+        },
+        pack=pack,
+    )
+
+
+def create_capsule_pack_file(
+    input_paths: list[str | Path],
+    output_path: str | Path,
+    summary: str = "",
+    tags: list[str] | None = None,
+) -> dict[str, Any]:
+    result = create_capsule_pack(input_paths, output_path=output_path, summary=summary, tags=tags)
+    pack_target = Path(output_path)
+    pack_target.parent.mkdir(parents=True, exist_ok=True)
+    pack_target.write_text(json.dumps(result.pack, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return result.metadata
+
+
+def token_report_file(input_path: str | Path) -> dict[str, Any]:
+    source_path = Path(input_path)
+    probe = source_path.read_bytes()
+    try:
+        document = json.loads(probe.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        report = token_estimate_for_bytes(probe)
+        report["sourceKind"] = "raw-file"
+        return report
+    if isinstance(document, dict) and document.get("kind") in ("slc-llm-transport", "slc-llm-transport-pack"):
+        transport_document = _validate_transport_document(document)
+        report = token_estimate_for_document(transport_document)
+        report["sourceKind"] = str(transport_document.get("kind"))
+        return report
+    report = token_estimate_for_bytes(probe)
+    report["sourceKind"] = "raw-json-file"
+    return report
 
 
 def _read_capsule(path: Path) -> dict[str, Any]:
