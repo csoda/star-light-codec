@@ -2,6 +2,8 @@
 
 Exact byte artifacts for AI workflows.
 
+Language: English | [日本語](README.ja.md)
+
 Star Light Codec is for tools that need an LLM or agent to work with real
 files without pasting those files, compressed payloads, or base64 blobs into the
 prompt. It packages bytes into exact artifacts, gives the model compact
