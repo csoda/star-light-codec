@@ -1,32 +1,58 @@
 # Star Light Codec
 
-Experimental exact byte artifact codec from the Star Light project.
+Exact byte artifacts for AI workflows.
 
-Star Light Codec packages arbitrary byte files into self-describing artifacts
-that can be decoded back to the exact original bytes. The first public format,
-`SLB1`, is small on purpose: it combines a binary payload, compact JSON metadata,
-bounded transform planning, and SHA-256 validation into one auditable container.
+Star Light Codec is for tools that need an LLM or agent to work with real
+files without pasting those files, compressed payloads, or base64 blobs into the
+prompt. It packages bytes into exact artifacts, gives the model compact
+manifests to reason over, and lets the tool layer hydrate exact chunks only when
+they are needed.
 
 This is not a media codec pack, not a video codec, and not related to Astro
 Starlight.
 
-The current public slice is deliberately narrow:
+It is especially useful for:
 
-- exact round-trip for arbitrary byte files;
-- a compact `SLB1` binary artifact container;
-- bounded gzip transform planning;
-- an optional experimental predictive residual model layer;
-- SHA-256 validation for the payload and original input;
-- storage-adoption metadata so incompressible data can stay uncompressed;
-- a compatibility profile for Star Light's `starlight-byte-exact` artifacts;
-- an encoder/decoder split where encoders can improve while decoders stay
-  simple.
+- AI workflows that need compact context plus exact byte recovery;
+- long-running coding or document sessions that should keep durable artifacts
+  outside the chat transcript;
+- automation that wants storage advice without silently losing exactness;
+- codec experiments where encoders can improve without making old decoders
+  complicated.
 
-The important part is not that the first encoder uses gzip. The important part
-is the artifact contract: a decoder can restore exact bytes without knowing the
-source file type, the payload can be validated before and after transforms, and
-new encoder planners can compete on compression ratio without changing the
-baseline decode model.
+```mermaid
+flowchart LR
+  input["Input bytes"] --> encode["Encode"]
+  encode --> artifact["SLB1 artifact"]
+  artifact --> capsule["Capsule manifest"]
+  capsule --> llm["LLM / agent workflow"]
+  llm --> hydrate["Hydrate exact chunks"]
+  hydrate --> restore["Exact restore"]
+  artifact --> restore
+```
+
+## What You Get Today
+
+- **Exact byte artifacts:** `SLB1` stores transformed payload bytes plus compact
+  metadata, length checks, and SHA-256 digests.
+- **LLM transport capsules:** small JSON manifests that describe artifacts,
+  chunks, summaries, tags, digests, and hydration affordances without embedding
+  raw bytes.
+- **Boring decoders:** decode stays allowlisted, deterministic, and
+  fail-closed. Encoder planners can improve without changing the exact restore
+  contract.
+- **Honest storage advice:** random or already-compressed data can be reported
+  as `keep-original-for-storage` instead of pretending every output is worth
+  storing.
+- **Experimental CDF profiles:** public profile descriptors and resolver
+  commands are available for standalone CDF oracle experiments, while production
+  `SLB1` compatibility remains conservative.
+
+The important part is not that the first baseline encoder uses gzip. The
+important part is the artifact contract: a decoder can restore exact bytes
+without knowing the source file type, the payload can be validated before and
+after transforms, and new encoder planners can compete on compression ratio
+without changing the baseline decode model.
 
 This repository starts with a readable Python reference implementation. Future
 work can add stronger encoders, chunking, dictionaries, domain-specific codecs,
