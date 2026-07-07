@@ -61,15 +61,28 @@ audit.
 
 ## Quick Start
 
+Start with the exact byte round trip:
+
 ```powershell
 python -m pip install -e .[test]
 python -m starlight_codec encode README.md README.slb1 --max-passes 2
 python -m starlight_codec inspect README.slb1
 python -m starlight_codec decode README.slb1 README.roundtrip.md
+```
+
+Then add the LLM transport layer when an agent should reason over metadata
+instead of raw or compressed bytes:
+
+```powershell
 python -m starlight_codec capsule README.md README.slb1 README.capsule.json --tag docs
 python -m starlight_codec capsule-pack README.pack.json README.capsule.json --summary "Docs pack"
 python -m starlight_codec token-report README.capsule.json README.pack.json
 python -m starlight_codec hydrate README.capsule.json README.chunk.md --chunk c0001
+```
+
+Run the reference tests when developing changes:
+
+```powershell
 pytest
 ```
 
@@ -77,7 +90,7 @@ The encoder writes an artifact. The decoder reconstructs the exact original
 bytes. The command output is metadata only; it does not print the package
 payload.
 
-## Why This Is Strong
+## Why It Matters
 
 - **Arbitrary bytes:** text, JSON, logs, binaries, generated artifacts, and
   unknown file types all use the same exact-byte interface.
