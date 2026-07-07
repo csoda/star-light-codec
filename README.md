@@ -220,6 +220,19 @@ It compares baseline `SLB1`, gzip-model `SLB1`, and strong `SLB1`
 in the local Python environment. It verifies exact decode by default and avoids
 embedding raw file contents in the report.
 
+For automatic predictor exploration, use the bounded search harness:
+
+```powershell
+python benchmarks\search_predictors.py README.md src tests `
+  --label-root . `
+  --search-mode adaptive `
+  --time-limit-seconds 30
+```
+
+The search harness learns within the run, prioritizes promising deterministic
+predictor candidates, verifies exact round-trip, and stops at the configured
+time/candidate/file limits.
+
 ## Name Check
 
 The project name is **Star Light Codec**. A quick public search found nearby

@@ -116,3 +116,48 @@ Privacy and publication notes:
 This real-data harness is the next step before making broad compression-ratio
 claims. Synthetic fixtures show behavior shape; real data shows whether a model
 is useful outside a toy pattern.
+
+## Predictor Search Harness
+
+Use the predictor search harness to let a small controller try deterministic
+prediction candidates under a strict budget:
+
+```powershell
+python benchmarks\search_predictors.py README.md src tests `
+  --label-root . `
+  --search-mode adaptive `
+  --time-limit-seconds 30 `
+  --candidate-limit 64 `
+  --file-limit 64
+```
+
+The harness is intentionally separate from the production codec. It creates
+temporary experimental `SLP1` artifacts, verifies exact round-trip for every
+candidate, and reports whether a candidate should be promoted, watched, or
+rejected. It does not embed raw file contents in the report.
+
+Search modes:
+
+- `adaptive`: default. A tiny in-run learning controller scores candidates from
+  sample residual hints, learned transform/compressor rewards, exploration, and
+  speed penalty.
+- `exhaustive`: deterministic candidate order for control runs and debugging.
+
+Safety limits:
+
+- `--time-limit-seconds` stops exploration after the requested wall-clock
+  budget.
+- `--candidate-limit` bounds candidate count.
+- `--file-limit` bounds corpus size.
+- `--max-file-bytes` skips large files.
+
+Current candidate families are deliberately simple and lossless:
+
+- `identity+compressor` controls;
+- `delta-prev-N+compressor`;
+- `xor-prev-N+compressor`;
+- `delta-avg2+compressor`.
+
+Promotion is mechanical: exact round-trip must pass, aggregate improvement must
+exceed the threshold, and worst regression must stay under the configured
+budget. Control candidates are marked `control-baseline`, not promoted.

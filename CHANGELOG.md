@@ -15,6 +15,8 @@
   without embedding raw file contents.
 - Added `--planner stdlib-auto`, which compares whole-artifact candidates using
   `gzip`, `zlib`, `bz2`, and `lzma`.
+- Added a bounded adaptive predictor search harness for experimental lossless
+  compression candidates.
 
 ## 0.1.0
 

@@ -174,6 +174,19 @@ python benchmarks\benchmark_real_data.py README.md src tests --label-root .
 compressor と比較します。既定で exact decode を検証し、レポートに raw file
 contents は埋め込みません。
 
+自動で predictor 候補を探索する場合は、時間制限付き search harness を使います。
+
+```powershell
+python benchmarks\search_predictors.py README.md src tests `
+  --label-root . `
+  --search-mode adaptive `
+  --time-limit-seconds 30
+```
+
+この harness は実行中に小さく学習しながら、見込みのある決定的 predictor 候補を
+優先的に試します。各 candidate は exact round-trip を検証し、
+`--time-limit-seconds`、`--candidate-limit`、`--file-limit` で止まります。
+
 ## ロードマップ
 
 ロードマップは [docs/roadmap.md](docs/roadmap.md) にあります。
