@@ -90,6 +90,20 @@ reference encoder は bounded transform planner を使います。
 これは到達点ではなく、土台です。今後 encoder 側を賢くしていきながら、
 exact round-trip と fail-closed decode を守ります。
 
+## 強化 planner
+
+互換性重視の既定値は `--planner gzip` のままですが、標準ライブラリだけを使う
+強化 planner も選べます。
+
+```powershell
+python -m starlight_codec encode input.bin input.slb1 --planner stdlib-auto --model auto
+```
+
+`stdlib-auto` は `gzip`、`zlib`、`bz2`、`lzma` で作った完全な `SLB1`
+artifact を比較し、metadata overhead まで含めて一番小さいものだけを採用します。
+decode は allowlist 済み transform と digest 検証のままなので、exact/fail-closed
+の性質は維持されます。
+
 ## 実験的な model layer
 
 Star Light Codec は、圧縮前に小さな決定的予測モデルを試すこともできます。
@@ -100,15 +114,16 @@ python -m starlight_codec capsule input.bin input.slb1 input.capsule.json --mode
 ```
 
 最初のモデルは `delta-prev-v1` です。ひとつ前の byte から次の byte を予測し、
-差分 residual を作ってから、通常の bounded gzip planner に渡します。
+差分 residual を作ってから、選択中の compression planner に渡します。
 
 これは neural compressor ではありません。また lossy でもありません。
 model id、model hash、transform stack、payload digest、最終 input digest を
 保存するので、decode は exact かつ fail-closed のままです。
 
 `--model auto` は baseline encoder と model encoder を比較し、`SLB1` artifact
-全体が小さくなる場合だけ model 側を採用します。既定値は互換性重視の
-`--model none` です。
+全体が小さくなる場合だけ model 側を採用します。現在の最強参照パスは
+`--planner stdlib-auto --model auto` です。既定値は互換性重視の `--model none`
+です。
 
 ## LLM transport capsule
 
@@ -154,7 +169,8 @@ random bytes、already-compressed input で比較しています。
 python benchmarks\benchmark_real_data.py README.md src tests --label-root .
 ```
 
-この harness は、`SLB1` と `--model auto` を、手元 Python 環境で使える標準系
+この harness は、baseline `SLB1`、gzip-model `SLB1`、strong `SLB1`
+（`--planner stdlib-auto --model auto`）を、手元 Python 環境で使える標準系
 compressor と比較します。既定で exact decode を検証し、レポートに raw file
 contents は埋め込みません。
 

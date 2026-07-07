@@ -20,6 +20,7 @@ def main(argv: list[str] | None = None) -> int:
     encode.add_argument("output")
     encode.add_argument("--max-passes", type=int, default=1)
     encode.add_argument("--model", choices=["none", "auto", "delta-prev-v1"], default="none")
+    encode.add_argument("--planner", choices=["gzip", "stdlib-auto"], default="gzip")
 
     decode = sub.add_parser("decode", help="decode an SLB1 artifact exactly")
     decode.add_argument("input")
@@ -34,6 +35,7 @@ def main(argv: list[str] | None = None) -> int:
     capsule.add_argument("capsule")
     capsule.add_argument("--max-passes", type=int, default=1)
     capsule.add_argument("--model", choices=["none", "auto", "delta-prev-v1"], default="none")
+    capsule.add_argument("--planner", choices=["gzip", "stdlib-auto"], default="gzip")
     capsule.add_argument("--summary", default="")
     capsule.add_argument("--tag", action="append", default=[])
     capsule.add_argument("--chunk-size", type=int, default=4096)
@@ -46,7 +48,15 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     if args.command == "encode":
-        print_json(encode_file(args.input, args.output, max_passes=args.max_passes, model=args.model))
+        print_json(
+            encode_file(
+                args.input,
+                args.output,
+                max_passes=args.max_passes,
+                model=args.model,
+                planner=args.planner,
+            )
+        )
         return 0
     if args.command == "decode":
         print_json(decode_file(args.input, args.output))
@@ -62,6 +72,7 @@ def main(argv: list[str] | None = None) -> int:
                 args.capsule,
                 max_passes=args.max_passes,
                 model=args.model,
+                planner=args.planner,
                 summary=args.summary,
                 tags=args.tag,
                 chunk_size=args.chunk_size,

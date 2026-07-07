@@ -98,6 +98,7 @@ def benchmark_fixture(name: str, data: bytes, max_passes: int, chunk_size: int, 
     gz_b64 = base64.b64encode(gz)
     encoded = encode_slb1(data, max_passes=max_passes)
     modeled = encode_slb1(data, max_passes=max_passes, model="auto")
+    strong = encode_slb1(data, max_passes=max_passes, model="auto", planner="stdlib-auto")
     capsule = create_capsule(
         data,
         artifact_path=f"{name}.slb1",
@@ -137,6 +138,9 @@ def benchmark_fixture(name: str, data: bytes, max_passes: int, chunk_size: int, 
         "slb1Bytes": len(encoded.artifact),
         "modelSlb1Bytes": len(modeled.artifact),
         "selectedModel": modeled.metadata["selectedModel"],
+        "strongSlb1Bytes": len(strong.artifact),
+        "strongPlanner": strong.metadata["selectedPlanner"],
+        "strongModel": strong.metadata["selectedModel"],
         "capsuleBytes": len(capsule_json),
         "chunkCount": len(capsule.capsule["chunkIndex"]),
         "firstChunkBytes": int(first_chunk["end"]) - int(first_chunk["start"]),
@@ -147,6 +151,8 @@ def benchmark_fixture(name: str, data: bytes, max_passes: int, chunk_size: int, 
         "slb1SavedPct": round(saved_pct(len(encoded.artifact), len(data)), 2),
         "modelSlb1SavedPct": round(saved_pct(len(modeled.artifact), len(data)), 2),
         "modelVsSlb1Pct": round(saved_pct(len(modeled.artifact), len(encoded.artifact)), 2),
+        "strongSlb1SavedPct": round(saved_pct(len(strong.artifact), len(data)), 2),
+        "strongVsSlb1Pct": round(saved_pct(len(strong.artifact), len(encoded.artifact)), 2),
         "capsulePromptVsRawPct": round(saved_pct(len(capsule_json), len(data)), 2),
         "encodeMedianMs": round(encode_ms, 3),
         "decodeMedianMs": round(decode_ms, 3),
@@ -183,13 +189,14 @@ def build_results(max_passes: int, chunk_size: int, repetitions: int) -> dict[st
 
 def markdown_table(results: dict[str, Any]) -> str:
     lines = [
-        "| fixture | raw bytes | gzip bytes | gzip+b64 chars | SLB1 bytes | model SLB1 | model | capsule bytes | SLB1 saved | model saved | capsule vs raw | decision | enc ms | dec ms | cap ms | chunk ms |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: |",
+        "| fixture | raw bytes | gzip bytes | gzip+b64 chars | SLB1 bytes | model SLB1 | strong SLB1 | planner | model | capsule bytes | SLB1 saved | strong saved | capsule vs raw | decision | enc ms | dec ms | cap ms | chunk ms |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: |",
     ]
     for row in results["fixtures"]:
         lines.append(
-            "| {fixture} | {raw} | {gzip} | {gzip_b64} | {slb1} | {model_slb1} | {model} | {capsule} | "
-            "{slb1_saved:.2f}% | {model_saved:.2f}% | {capsule_saved:.2f}% | {decision} | "
+            "| {fixture} | {raw} | {gzip} | {gzip_b64} | {slb1} | {model_slb1} | {strong_slb1} | "
+            "{planner} | {model} | {capsule} | {slb1_saved:.2f}% | {strong_saved:.2f}% | "
+            "{capsule_saved:.2f}% | {decision} | "
             "{enc:.3f} | {dec:.3f} | {cap:.3f} | {chunk:.3f} |".format(
                 fixture=row["fixture"],
                 raw=format_bytes(row["rawBytes"]),
@@ -197,10 +204,12 @@ def markdown_table(results: dict[str, Any]) -> str:
                 gzip_b64=format_bytes(row["gzipBase64Chars"]),
                 slb1=format_bytes(row["slb1Bytes"]),
                 model_slb1=format_bytes(row["modelSlb1Bytes"]),
-                model=row["selectedModel"],
+                strong_slb1=format_bytes(row["strongSlb1Bytes"]),
+                planner=row["strongPlanner"],
+                model=row["strongModel"],
                 capsule=format_bytes(row["capsuleBytes"]),
                 slb1_saved=row["slb1SavedPct"],
-                model_saved=row["modelSlb1SavedPct"],
+                strong_saved=row["strongSlb1SavedPct"],
                 capsule_saved=row["capsulePromptVsRawPct"],
                 decision=row["adoptionDecision"],
                 enc=row["encodeMedianMs"],

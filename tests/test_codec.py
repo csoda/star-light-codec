@@ -173,6 +173,68 @@ def test_auto_model_compares_whole_artifact_size() -> None:
     assert decode_slb1(encoded.artifact).data == data
 
 
+def test_stdlib_auto_planner_selects_supported_transform() -> None:
+    rows = [
+        {
+            "event": "codec.transport",
+            "index": index,
+            "level": "info" if index % 7 else "debug",
+            "project": "star-light-codec",
+            "tags": ["exact-roundtrip", "llm-transport", f"bucket-{index % 8}"],
+        }
+        for index in range(768)
+    ]
+    data = (
+        "\n".join(json.dumps(row, sort_keys=True, separators=(",", ":")) for row in rows)
+        + "\n"
+    ).encode("utf-8")
+    baseline = encode_slb1(data, max_passes=2)
+    encoded = encode_slb1(data, max_passes=2, planner="stdlib-auto")
+
+    assert encoded.metadata["selectedPlanner"] == "stdlib-auto"
+    assert encoded.metadata["strategy"] in {
+        "zlib-base64",
+        "bz2-base64",
+        "lzma-base64",
+    }
+    assert len(encoded.artifact) <= len(baseline.artifact)
+    assert decode_slb1(encoded.artifact).data == data
+
+
+def test_stdlib_auto_planner_works_with_model_auto() -> None:
+    data = bytes((index * 3) % 256 for index in range(8192))
+    encoded = encode_slb1(data, max_passes=2, model="auto", planner="stdlib-auto")
+
+    assert encoded.metadata["selectedPlanner"] == "stdlib-auto"
+    assert encoded.metadata["selectedModel"] in {"none", "delta-prev-v1"}
+    assert decode_slb1(encoded.artifact).data == data
+
+
+def test_unsupported_planner_is_rejected() -> None:
+    with pytest.raises(StarLightCodecError):
+        encode_slb1(b"abc", planner="quantum")
+
+
+def test_strategy_must_match_transform_stack() -> None:
+    encoded = encode_slb1(b"abc" * 100, max_passes=2, planner="stdlib-auto")
+    header_len = int.from_bytes(encoded.artifact[4:8], "little")
+    payload_len = int.from_bytes(encoded.artifact[8:16], "little")
+    header = json.loads(encoded.artifact[16 : 16 + header_len].decode("utf-8"))
+    header["strategy"] = "stored-base64"
+    header_bytes = json.dumps(header, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    payload = encoded.artifact[16 + header_len :]
+    tampered = (
+        MAGIC_SLB1
+        + len(header_bytes).to_bytes(4, "little")
+        + payload_len.to_bytes(8, "little")
+        + header_bytes
+        + payload
+    )
+
+    with pytest.raises(StarLightCodecError):
+        decode_slb1(tampered)
+
+
 def test_unsupported_model_is_rejected() -> None:
     with pytest.raises(StarLightCodecError):
         encode_slb1(b"abc", model="tiny-transformer")

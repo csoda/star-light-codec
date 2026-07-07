@@ -179,9 +179,15 @@ def benchmark_file(path: Path, options: RealDataOptions, compressors: list[Compr
 
     slb1 = encode_slb1(data, max_passes=options.max_passes, model="none")
     modeled = encode_slb1(data, max_passes=options.max_passes, model="auto")
+    strong = encode_slb1(
+        data,
+        max_passes=options.max_passes,
+        model="auto",
+        planner="stdlib-auto",
+    )
     verification = "skipped"
     if options.verify:
-        verification = "pass" if decode_slb1(modeled.artifact).data == data else "fail"
+        verification = "pass" if decode_slb1(strong.artifact).data == data else "fail"
 
     best_general = min(codec_rows, key=lambda row: int(row["bytes"])) if codec_rows else None
     best_general_bytes = int(best_general["bytes"]) if best_general else raw_bytes
@@ -200,6 +206,12 @@ def benchmark_file(path: Path, options: RealDataOptions, compressors: list[Compr
         "modelSlb1SavedPct": saved_pct(len(modeled.artifact), raw_bytes),
         "selectedModel": modeled.metadata["selectedModel"],
         "modelVsBestGeneralPct": size_delta_pct(len(modeled.artifact), best_general_bytes),
+        "strongSlb1Bytes": len(strong.artifact),
+        "strongSlb1SavedPct": saved_pct(len(strong.artifact), raw_bytes),
+        "strongPlanner": strong.metadata["selectedPlanner"],
+        "strongModel": strong.metadata["selectedModel"],
+        "strongStrategy": strong.metadata["strategy"],
+        "strongVsBestGeneralPct": size_delta_pct(len(strong.artifact), best_general_bytes),
         "verification": verification,
     }
     if options.include_digest:
@@ -215,6 +227,7 @@ def build_results(options: RealDataOptions) -> dict[str, Any]:
     total_best_general = sum(int(row["bestGeneralBytes"]) for row in rows)
     total_slb1 = sum(int(row["slb1Bytes"]) for row in rows)
     total_model = sum(int(row["modelSlb1Bytes"]) for row in rows)
+    total_strong = sum(int(row["strongSlb1Bytes"]) for row in rows)
     return {
         "schemaVersion": 1,
         "benchmark": "star-light-codec-real-data",
@@ -241,6 +254,9 @@ def build_results(options: RealDataOptions) -> dict[str, Any]:
             "modelSlb1Bytes": total_model,
             "modelSlb1SavedPct": saved_pct(total_model, total_raw),
             "modelVsBestGeneralPct": size_delta_pct(total_model, total_best_general),
+            "strongSlb1Bytes": total_strong,
+            "strongSlb1SavedPct": saved_pct(total_strong, total_raw),
+            "strongVsBestGeneralPct": size_delta_pct(total_strong, total_best_general),
         },
     }
 
@@ -255,30 +271,31 @@ def markdown_table(results: dict[str, Any]) -> str:
         f"Files: {summary['fileCount']}  Skipped: {summary['skippedCount']}  "
         f"Raw: {format_bytes(summary['rawBytes'])} bytes",
         "",
-        "| file | ext | raw | best general | best bytes | best saved | model SLB1 | model | model saved | model vs best | verify |",
-        "| --- | --- | ---: | --- | ---: | ---: | ---: | --- | ---: | ---: | --- |",
+        "| file | ext | raw | best general | best bytes | best saved | strong SLB1 | planner | model | strong saved | strong vs best | verify |",
+        "| --- | --- | ---: | --- | ---: | ---: | ---: | --- | --- | ---: | ---: | --- |",
     ]
     for row in results["files"]:
         lines.append(
             "| {path} | {ext} | {raw} | {best} | {best_bytes} | {best_saved:.2f}% | "
-            "{model_bytes} | {model} | {model_saved:.2f}% | {model_vs_best:+.2f}% | {verify} |".format(
+            "{strong_bytes} | {planner} | {model} | {strong_saved:.2f}% | {strong_vs_best:+.2f}% | {verify} |".format(
                 path=escape_md(str(row["path"])),
                 ext=escape_md(str(row["extension"] or "-")),
                 raw=format_bytes(int(row["rawBytes"])),
                 best=escape_md(str(row["bestGeneralCodec"])),
                 best_bytes=format_bytes(int(row["bestGeneralBytes"])),
                 best_saved=float(row["bestGeneralSavedPct"]),
-                model_bytes=format_bytes(int(row["modelSlb1Bytes"])),
-                model=escape_md(str(row["selectedModel"])),
-                model_saved=float(row["modelSlb1SavedPct"]),
-                model_vs_best=float(row["modelVsBestGeneralPct"]),
+                strong_bytes=format_bytes(int(row["strongSlb1Bytes"])),
+                planner=escape_md(str(row["strongPlanner"])),
+                model=escape_md(str(row["strongModel"])),
+                strong_saved=float(row["strongSlb1SavedPct"]),
+                strong_vs_best=float(row["strongVsBestGeneralPct"]),
                 verify=escape_md(str(row["verification"])),
             )
         )
     lines.extend(
         [
             "",
-            "| aggregate | bytes | saved | model vs best general |",
+            "| aggregate | bytes | saved | vs best general |",
             "| --- | ---: | ---: | ---: |",
             "| best general | {bytes} | {saved:.2f}% | - |".format(
                 bytes=format_bytes(int(summary["bestGeneralBytes"])),
@@ -293,6 +310,11 @@ def markdown_table(results: dict[str, Any]) -> str:
                 bytes=format_bytes(int(summary["modelSlb1Bytes"])),
                 saved=float(summary["modelSlb1SavedPct"]),
                 delta=float(summary["modelVsBestGeneralPct"]),
+            ),
+            "| strong SLB1 | {bytes} | {saved:.2f}% | {delta:+.2f}% |".format(
+                bytes=format_bytes(int(summary["strongSlb1Bytes"])),
+                saved=float(summary["strongSlb1SavedPct"]),
+                delta=float(summary["strongVsBestGeneralPct"]),
             ),
         ]
     )

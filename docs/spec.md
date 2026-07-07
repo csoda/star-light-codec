@@ -59,11 +59,12 @@ The current header is a JSON object with these required fields:
 | `mode` | Current value: `exact` |
 | `codec` | Current value: `starlight-byte-exact` |
 | `prototype` | Current value: `true` |
-| `strategy` | `stored-base64`, `gzip-base64`, `gzip-recursive-base64`, `delta-prev-stored-base64`, `delta-prev-gzip-base64`, or `delta-prev-gzip-recursive-base64` |
+| `strategy` | Transform-derived strategy such as `stored-base64`, `gzip-base64`, `bz2-base64`, `lzma-base64`, `delta-prev-zlib-base64`, or `gzip-recursive-base64` |
 | `classification` | Input shape hint such as `text-like`, `binary`, or `empty` |
+| `planner` | Selected compression planner, currently `gzip` or `stdlib-auto` |
 | `fallbackReason` | Reason compression was not adopted for the payload, if any |
 | `maxPasses` | Encoder's bounded transform limit, 1 through 4 |
-| `recursivePasses` | Count of applied `gzip` transforms |
+| `recursivePasses` | Count of applied compression transforms |
 | `recursiveReady` | Current value: `true` |
 | `transforms` | Ordered transform names applied to the payload |
 | `selectedModel` | `none` or the prediction model selected by the encoder |
@@ -74,10 +75,24 @@ The current header is a JSON object with these required fields:
 | `payloadDigest` | `sha256:<64 hex>` digest of transformed payload |
 | `layers` | Layer metadata; currently one raw payload layer |
 
-The baseline transform is `gzip`. Experimental model artifacts may also include
-`delta-prev-v1`. The strategy names include `base64` because they are shared
-with Star Light's JSON package profile. In `SLB1`, the payload bytes are still
-stored raw outside the JSON header.
+The baseline transform is `gzip`. `stdlib-auto` artifacts may also use `zlib`,
+`bz2`, or `lzma`. Experimental model artifacts may include `delta-prev-v1`
+before a compression transform. The strategy names include `base64` because
+they are shared with Star Light's JSON package profile. In `SLB1`, the payload
+bytes are still stored raw outside the JSON header.
+
+## Compression Planners
+
+The reference encoder supports two planners:
+
+| Planner | Behavior |
+| --- | --- |
+| `gzip` | Compatibility baseline. Tries bounded recursive gzip and stores only passes that reduce payload size. |
+| `stdlib-auto` | Compares whole-artifact candidates using `gzip`, `zlib`, `bz2`, and `lzma`, then keeps the smallest complete `SLB1` artifact. |
+
+Planner selection is an encoder concern. Decoders do not trust the planner
+string alone; they verify the transform stack, payload digest, final input
+digest, and strategy/transform consistency.
 
 ## Experimental Prediction Model
 
@@ -106,7 +121,7 @@ for byte in input:
     previous = byte
 ```
 
-The residual byte stream is then passed through the normal bounded gzip
+The residual byte stream is then passed through the selected compression
 planner. The transform stack is ordered as applied, for example:
 
 ```json

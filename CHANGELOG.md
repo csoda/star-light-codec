@@ -13,6 +13,8 @@
   with `--model auto` selection.
 - Added a real-data benchmark harness for local file compression comparisons
   without embedding raw file contents.
+- Added `--planner stdlib-auto`, which compares whole-artifact candidates using
+  `gzip`, `zlib`, `bz2`, and `lzma`.
 
 ## 0.1.0
 

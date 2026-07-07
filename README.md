@@ -121,6 +121,20 @@ The reference encoder uses a bounded transform planner:
 This is a baseline, not the ceiling. The roadmap is to make the encoder smarter
 while keeping exact round-trip and fail-closed decode behavior as the invariant.
 
+## Stronger Planner
+
+The compatibility default is still `--planner gzip`, but you can opt into a
+stronger standard-library planner:
+
+```powershell
+python -m starlight_codec encode input.bin input.slb1 --planner stdlib-auto --model auto
+```
+
+`stdlib-auto` compares complete `SLB1` artifacts produced with `gzip`, `zlib`,
+`bz2`, and `lzma`, then keeps the smallest whole artifact. This matters because
+payload-only wins can disappear after metadata overhead. Decode remains
+allowlisted and exact.
+
 ## Experimental Model Layer
 
 Star Light Codec can also try a small deterministic prediction model before
@@ -132,15 +146,16 @@ python -m starlight_codec capsule input.bin input.slb1 input.capsule.json --mode
 ```
 
 The first model is `delta-prev-v1`. It predicts each byte from the previous
-byte, stores the byte-wise residual, then lets the normal bounded gzip planner
+byte, stores the byte-wise residual, then lets the selected compression planner
 compress that residual. This is not a neural compressor and it is not lossy:
 the model id, model hash, transform stack, payload digest, and final input
 digest are all stored so decode remains exact and fail-closed.
 
 `--model auto` compares the baseline encoder with the modeled encoder and keeps
-the modeled artifact only when the whole `SLB1` artifact is smaller. The default
-is still `--model none` for maximum compatibility with the baseline `SLB1`
-contract.
+the modeled artifact only when the whole `SLB1` artifact is smaller. Combine it
+with `--planner stdlib-auto` for the current strongest reference path. The
+default is still `--model none` for maximum compatibility with the baseline
+`SLB1` contract.
 
 ## LLM Transport Capsules
 
@@ -200,8 +215,9 @@ For local files, use the real-data harness:
 python benchmarks\benchmark_real_data.py README.md src tests --label-root .
 ```
 
-It compares `SLB1` and `--model auto` against standard compressors available in
-the local Python environment, verifies exact decode by default, and avoids
+It compares baseline `SLB1`, gzip-model `SLB1`, and strong `SLB1`
+(`--planner stdlib-auto --model auto`) against standard compressors available
+in the local Python environment. It verifies exact decode by default and avoids
 embedding raw file contents in the report.
 
 ## Name Check

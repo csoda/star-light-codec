@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import bz2
 import gzip
 import hashlib
 import json
 import os
 import struct
+import lzma
+import zlib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -12,6 +15,9 @@ from typing import Any
 
 MAGIC_SLB1 = b"SLB1"
 MAX_PASSES = 4
+PLANNER_GZIP = "gzip"
+PLANNER_STDLIB_AUTO = "stdlib-auto"
+COMPRESSOR_TRANSFORMS = ("gzip", "zlib", "bz2", "lzma")
 MODEL_NONE = "none"
 MODEL_AUTO = "auto"
 MODEL_DELTA_PREV_V1 = "delta-prev-v1"
@@ -22,11 +28,6 @@ MODEL_DELTA_PREV_V1_SPEC = (
 MODEL_DELTA_PREV_V1_HASH = "sha256:" + hashlib.sha256(
     MODEL_DELTA_PREV_V1_SPEC.encode("utf-8")
 ).hexdigest()
-MODEL_STRATEGIES = {
-    "delta-prev-stored-base64",
-    "delta-prev-gzip-base64",
-    "delta-prev-gzip-recursive-base64",
-}
 
 
 class StarLightCodecError(ValueError):
@@ -69,12 +70,28 @@ def classify(data: bytes) -> str:
     return "binary"
 
 
-def _compress_once(data: bytes) -> bytes:
-    return gzip.compress(data, compresslevel=9, mtime=0)
+def _compress_transform(data: bytes, transform: str) -> bytes:
+    if transform == "gzip":
+        return gzip.compress(data, compresslevel=9, mtime=0)
+    if transform == "zlib":
+        return zlib.compress(data, level=9)
+    if transform == "bz2":
+        return bz2.compress(data, compresslevel=9)
+    if transform == "lzma":
+        return lzma.compress(data, preset=9)
+    raise StarLightCodecError(f"Unsupported compression transform: {transform}")
 
 
-def _decompress_once(data: bytes) -> bytes:
-    return gzip.decompress(data)
+def _decompress_transform(data: bytes, transform: str) -> bytes:
+    if transform == "gzip":
+        return gzip.decompress(data)
+    if transform == "zlib":
+        return zlib.decompress(data)
+    if transform == "bz2":
+        return bz2.decompress(data)
+    if transform == "lzma":
+        return lzma.decompress(data)
+    raise StarLightCodecError(f"Unsupported compression transform: {transform}")
 
 
 def _delta_prev_encode(data: bytes) -> bytes:
@@ -101,7 +118,7 @@ def _plan_gzip_transforms(data: bytes, max_passes: int) -> tuple[bytes, list[str
     payload = data
     transforms: list[str] = []
     for _ in range(bounded):
-        compressed = _compress_once(payload)
+        compressed = _compress_transform(payload, "gzip")
         if len(compressed) >= len(payload):
             break
         payload = compressed
@@ -109,17 +126,96 @@ def _plan_gzip_transforms(data: bytes, max_passes: int) -> tuple[bytes, list[str
     return payload, transforms
 
 
+def _plan_stdlib_transforms(data: bytes, max_passes: int) -> tuple[bytes, list[str]]:
+    candidates: list[tuple[bytes, list[str]]] = [(data, [])]
+    candidates.append(_plan_gzip_transforms(data, max_passes=max_passes))
+    for transform in ("zlib", "bz2", "lzma"):
+        compressed = _compress_transform(data, transform)
+        if len(compressed) < len(data):
+            candidates.append((compressed, [transform]))
+    return min(candidates, key=lambda candidate: len(candidate[0]))
+
+
+def _plan_compressor_transforms(data: bytes, max_passes: int, planner: str) -> tuple[bytes, list[str]]:
+    normalized_planner = _validate_planner_name(planner)
+    if normalized_planner == PLANNER_GZIP:
+        return _plan_gzip_transforms(data, max_passes=max_passes)
+    return _plan_stdlib_transforms(data, max_passes=max_passes)
+
+
 def _strategy_for_transforms(transforms: list[str]) -> str:
     has_model = MODEL_DELTA_PREV_V1 in transforms
+    compression_transforms = [transform for transform in transforms if transform in COMPRESSOR_TRANSFORMS]
+    prefix = "delta-prev-" if has_model else ""
+    if not compression_transforms:
+        return f"{prefix}stored-base64" if prefix else "stored-base64"
+    if len(compression_transforms) == 1:
+        return f"{prefix}{compression_transforms[0]}-base64"
+    if len(set(compression_transforms)) == 1:
+        return f"{prefix}{compression_transforms[0]}-recursive-base64"
+    return f"{prefix}mixed-recursive-base64"
+
+
+def _validate_planner_name(planner: str) -> str:
+    normalized = (planner or PLANNER_GZIP).strip().lower()
+    if normalized not in (PLANNER_GZIP, PLANNER_STDLIB_AUTO):
+        raise StarLightCodecError("Unsupported compression planner.")
+    return normalized
+
+
+def _validate_model_name(model: str) -> str:
+    normalized = (model or MODEL_NONE).strip().lower()
+    if normalized not in (MODEL_NONE, MODEL_AUTO, MODEL_DELTA_PREV_V1):
+        raise StarLightCodecError("Unsupported prediction model.")
+    return normalized
+
+
+def _fallback_reason(model: str, transforms: list[str]) -> str:
+    if any(transform in COMPRESSOR_TRANSFORMS for transform in transforms):
+        return ""
+    if model == MODEL_DELTA_PREV_V1:
+        return "model-compression-not-beneficial"
+    return "compression-not-beneficial"
+
+
+def _count_compressor_passes(transforms: list[str]) -> int:
+    return sum(1 for transform in transforms if transform in COMPRESSOR_TRANSFORMS)
+
+
+def _supported_strategy_names() -> set[str]:
+    names = {"stored-base64", "delta-prev-stored-base64"}
+    for transform in COMPRESSOR_TRANSFORMS:
+        names.add(f"{transform}-base64")
+        names.add(f"{transform}-recursive-base64")
+        names.add(f"delta-prev-{transform}-base64")
+        names.add(f"delta-prev-{transform}-recursive-base64")
+    names.add("mixed-recursive-base64")
+    names.add("delta-prev-mixed-recursive-base64")
+    return names
+
+
+def _validate_transform_stack(transforms: list[str]) -> None:
+    for transform in transforms:
+        if transform not in (*COMPRESSOR_TRANSFORMS, MODEL_DELTA_PREV_V1):
+            raise StarLightCodecError(f"Unsupported transform: {transform}")
+    model_passes = sum(1 for transform in transforms if transform == MODEL_DELTA_PREV_V1)
+    if model_passes > 1:
+        raise StarLightCodecError("Prediction model transform depth exceeds limit.")
+    if MODEL_DELTA_PREV_V1 in transforms and transforms[0] != MODEL_DELTA_PREV_V1:
+        raise StarLightCodecError("Prediction model transform order is invalid.")
+
+
+def _legacy_strategy_for_transforms(transforms: list[str]) -> str:
     gzip_count = sum(1 for transform in transforms if transform == "gzip")
-    if has_model:
-        if gzip_count == 0:
-            return "delta-prev-stored-base64"
-        if gzip_count == 1:
-            return "delta-prev-gzip-base64"
-        return "delta-prev-gzip-recursive-base64"
+    has_model = MODEL_DELTA_PREV_V1 in transforms
     if not transforms:
         return "stored-base64"
+    if has_model and gzip_count == 0:
+        return "delta-prev-stored-base64"
+    if has_model and gzip_count == 1:
+        return "delta-prev-gzip-base64"
+    if has_model:
+        return "delta-prev-gzip-recursive-base64"
     if gzip_count == 1:
         return "gzip-base64"
     return "gzip-recursive-base64"
@@ -136,38 +232,69 @@ def _model_metadata(model: str) -> dict[str, str]:
     return {"modelId": MODEL_NONE}
 
 
-def _validate_model_name(model: str) -> str:
-    normalized = (model or MODEL_NONE).strip().lower()
-    if normalized not in (MODEL_NONE, MODEL_AUTO, MODEL_DELTA_PREV_V1):
-        raise StarLightCodecError("Unsupported prediction model.")
-    return normalized
-
-
 def _plan_payload_once(
     data: bytes,
     max_passes: int = 1,
     model: str = MODEL_NONE,
-) -> tuple[bytes, list[str], str, str, str]:
+    planner: str = PLANNER_GZIP,
+) -> tuple[bytes, list[str], str, str, str, str]:
     normalized_model = _validate_model_name(model)
+    normalized_planner = _validate_planner_name(planner)
     if normalized_model == MODEL_AUTO:
         raise StarLightCodecError("Internal payload planner does not accept auto model selection.")
     if normalized_model == MODEL_NONE:
-        payload, transforms = _plan_gzip_transforms(data, max_passes=max_passes)
-        fallback_reason = "compression-not-beneficial" if not transforms else ""
-        return payload, transforms, _strategy_for_transforms(transforms), fallback_reason, MODEL_NONE
+        payload, transforms = _plan_compressor_transforms(
+            data,
+            max_passes=max_passes,
+            planner=normalized_planner,
+        )
+        return (
+            payload,
+            transforms,
+            _strategy_for_transforms(transforms),
+            _fallback_reason(normalized_model, transforms),
+            MODEL_NONE,
+            normalized_planner,
+        )
     residual = _delta_prev_encode(data)
-    payload, gzip_transforms = _plan_gzip_transforms(residual, max_passes=max_passes)
-    transforms = [MODEL_DELTA_PREV_V1, *gzip_transforms]
-    fallback_reason = "model-compression-not-beneficial" if not gzip_transforms else ""
-    return payload, transforms, _strategy_for_transforms(transforms), fallback_reason, MODEL_DELTA_PREV_V1
+    payload, compressor_transforms = _plan_compressor_transforms(
+        residual,
+        max_passes=max_passes,
+        planner=normalized_planner,
+    )
+    transforms = [MODEL_DELTA_PREV_V1, *compressor_transforms]
+    return (
+        payload,
+        transforms,
+        _strategy_for_transforms(transforms),
+        _fallback_reason(normalized_model, transforms),
+        MODEL_DELTA_PREV_V1,
+        normalized_planner,
+    )
 
 
-def plan_payload(data: bytes, max_passes: int = 1, model: str = MODEL_NONE) -> tuple[bytes, list[str], str, str, str]:
+def plan_payload(
+    data: bytes,
+    max_passes: int = 1,
+    model: str = MODEL_NONE,
+    planner: str = PLANNER_GZIP,
+) -> tuple[bytes, list[str], str, str, str, str]:
     normalized_model = _validate_model_name(model)
+    normalized_planner = _validate_planner_name(planner)
     if normalized_model != MODEL_AUTO:
-        return _plan_payload_once(data, max_passes=max_passes, model=normalized_model)
-    baseline = _plan_payload_once(data, max_passes=max_passes, model=MODEL_NONE)
-    modeled = _plan_payload_once(data, max_passes=max_passes, model=MODEL_DELTA_PREV_V1)
+        return _plan_payload_once(
+            data,
+            max_passes=max_passes,
+            model=normalized_model,
+            planner=normalized_planner,
+        )
+    baseline = _plan_payload_once(data, max_passes=max_passes, model=MODEL_NONE, planner=normalized_planner)
+    modeled = _plan_payload_once(
+        data,
+        max_passes=max_passes,
+        model=MODEL_DELTA_PREV_V1,
+        planner=normalized_planner,
+    )
     if len(modeled[0]) < len(baseline[0]):
         return modeled
     return baseline
@@ -192,21 +319,21 @@ def adoption_metadata(raw_bytes: int, artifact_bytes: int, fallback_reason: str)
     }
 
 
-def encode_slb1(data: bytes, max_passes: int = 1, model: str = MODEL_NONE) -> EncodeResult:
-    normalized_model = _validate_model_name(model)
-    if normalized_model == MODEL_AUTO:
-        baseline = encode_slb1(data, max_passes=max_passes, model=MODEL_NONE)
-        modeled = encode_slb1(data, max_passes=max_passes, model=MODEL_DELTA_PREV_V1)
-        return modeled if len(modeled.artifact) < len(baseline.artifact) else baseline
-
-    payload, transforms, strategy, fallback_reason, selected_model = plan_payload(
+def _encode_slb1_once(
+    data: bytes,
+    max_passes: int = 1,
+    model: str = MODEL_NONE,
+    planner: str = PLANNER_GZIP,
+) -> EncodeResult:
+    payload, transforms, strategy, fallback_reason, selected_model, selected_planner = plan_payload(
         data,
         max_passes=max_passes,
-        model=normalized_model,
+        model=model,
+        planner=planner,
     )
     raw_digest = sha256_digest(data)
     payload_digest = sha256_digest(payload)
-    gzip_passes = sum(1 for transform in transforms if transform == "gzip")
+    compressor_passes = _count_compressor_passes(transforms)
     header = {
         "schemaVersion": 2,
         "feature": "semantic-codec",
@@ -220,9 +347,10 @@ def encode_slb1(data: bytes, max_passes: int = 1, model: str = MODEL_NONE) -> En
         "prototype": True,
         "strategy": strategy,
         "classification": classify(data),
+        "planner": selected_planner,
         "fallbackReason": fallback_reason,
         "maxPasses": max(1, min(MAX_PASSES, int(max_passes))),
-        "recursivePasses": gzip_passes,
+        "recursivePasses": compressor_passes,
         "recursiveReady": True,
         "transforms": transforms,
         "predictionModel": _model_metadata(selected_model),
@@ -249,11 +377,41 @@ def encode_slb1(data: bytes, max_passes: int = 1, model: str = MODEL_NONE) -> En
         "packageBytes": len(artifact),
         "selectedStrategy": strategy,
         "selectedModel": selected_model,
+        "selectedPlanner": selected_planner,
         "payloadRatio": round(len(payload) / len(data), 4) if data else 0,
         "artifactRatio": round(len(artifact) / len(data), 4) if data else 0,
     }
     metadata.update(adoption_metadata(len(data), len(artifact), fallback_reason))
     return EncodeResult(metadata=metadata, artifact=artifact)
+
+
+def encode_slb1(
+    data: bytes,
+    max_passes: int = 1,
+    model: str = MODEL_NONE,
+    planner: str = PLANNER_GZIP,
+) -> EncodeResult:
+    normalized_model = _validate_model_name(model)
+    normalized_planner = _validate_planner_name(planner)
+    candidate_models = (
+        [MODEL_NONE, MODEL_DELTA_PREV_V1] if normalized_model == MODEL_AUTO else [normalized_model]
+    )
+    candidate_planners = (
+        [PLANNER_GZIP, PLANNER_STDLIB_AUTO]
+        if normalized_planner == PLANNER_STDLIB_AUTO
+        else [PLANNER_GZIP]
+    )
+    candidates = [
+        _encode_slb1_once(
+            data,
+            max_passes=max_passes,
+            model=candidate_model,
+            planner=candidate_planner,
+        )
+        for candidate_planner in candidate_planners
+        for candidate_model in candidate_models
+    ]
+    return min(candidates, key=lambda candidate: len(candidate.artifact))
 
 
 def read_slb1(artifact: bytes) -> tuple[dict[str, Any], bytes]:
@@ -306,12 +464,7 @@ def decode_slb1(artifact: bytes) -> DecodeResult:
         raise StarLightCodecError("Unsupported container.")
     if "data" in header:
         raise StarLightCodecError("SLB1 header must not embed top-level data.")
-    if header.get("strategy") not in (
-        "stored-base64",
-        "gzip-base64",
-        "gzip-recursive-base64",
-        *MODEL_STRATEGIES,
-    ):
+    if header.get("strategy") not in _supported_strategy_names():
         raise StarLightCodecError("Unsupported strategy.")
     if int(header.get("payloadBytes", -1)) != len(payload):
         raise StarLightCodecError("Payload size mismatch.")
@@ -332,6 +485,12 @@ def decode_slb1(artifact: bytes) -> DecodeResult:
     transforms = list(header.get("transforms", []))
     if transforms != list(payload_layer.get("transforms", [])):
         raise StarLightCodecError("Payload layer transform mismatch.")
+    _validate_transform_stack(transforms)
+    if header.get("strategy") not in (
+        _strategy_for_transforms(transforms),
+        _legacy_strategy_for_transforms(transforms),
+    ):
+        raise StarLightCodecError("Strategy does not match transform stack.")
     prediction_model = header.get("predictionModel", {"modelId": MODEL_NONE})
     if not isinstance(prediction_model, dict):
         raise StarLightCodecError("Invalid prediction model metadata.")
@@ -345,23 +504,17 @@ def decode_slb1(artifact: bytes) -> DecodeResult:
             raise StarLightCodecError("Prediction model transform is missing.")
     if MODEL_DELTA_PREV_V1 in transforms and model_id != MODEL_DELTA_PREV_V1:
         raise StarLightCodecError("Prediction model metadata is missing.")
-    gzip_passes = sum(1 for transform in transforms if transform == "gzip")
-    model_passes = sum(1 for transform in transforms if transform == MODEL_DELTA_PREV_V1)
-    if model_passes > 1:
-        raise StarLightCodecError("Prediction model transform depth exceeds limit.")
-    for transform in transforms:
-        if transform not in ("gzip", MODEL_DELTA_PREV_V1):
-            raise StarLightCodecError(f"Unsupported transform: {transform}")
-    if int(header.get("recursivePasses", -1)) != gzip_passes:
+    compressor_passes = _count_compressor_passes(transforms)
+    if int(header.get("recursivePasses", -1)) != compressor_passes:
         raise StarLightCodecError("Recursive pass count mismatch.")
-    if gzip_passes > int(header.get("maxPasses", 0)):
+    if compressor_passes > int(header.get("maxPasses", 0)):
         raise StarLightCodecError("Transform depth exceeds maxPasses.")
-    if gzip_passes > MAX_PASSES:
+    if compressor_passes > MAX_PASSES:
         raise StarLightCodecError("Transform depth exceeds limit.")
     data = payload
     for transform in reversed(transforms):
-        if transform == "gzip":
-            data = _decompress_once(data)
+        if transform in COMPRESSOR_TRANSFORMS:
+            data = _decompress_transform(data, transform)
         elif transform == MODEL_DELTA_PREV_V1:
             data = _delta_prev_decode(data)
     if len(data) != int(header.get("rawBytes", -1)):
@@ -378,9 +531,10 @@ def encode_file(
     output_path: str | Path,
     max_passes: int = 1,
     model: str = MODEL_NONE,
+    planner: str = PLANNER_GZIP,
 ) -> dict[str, Any]:
     data = Path(input_path).read_bytes()
-    result = encode_slb1(data, max_passes=max_passes, model=model)
+    result = encode_slb1(data, max_passes=max_passes, model=model, planner=planner)
     Path(output_path).write_bytes(result.artifact)
     return result.metadata
 
@@ -432,13 +586,14 @@ def create_capsule(
     capsule_path: str | Path,
     max_passes: int = 1,
     model: str = MODEL_NONE,
+    planner: str = PLANNER_GZIP,
     summary: str = "",
     tags: list[str] | None = None,
     chunk_size: int = 4096,
 ) -> CapsuleResult:
     artifact_target = Path(artifact_path)
     capsule_target = Path(capsule_path)
-    encoded = encode_slb1(data, max_passes=max_passes, model=model)
+    encoded = encode_slb1(data, max_passes=max_passes, model=model, planner=planner)
     normalized_tags = sorted({tag.strip() for tag in (tags or []) if tag.strip()})
     artifact_ref = _relative_artifact_ref(artifact_target, capsule_target)
     capsule = {
@@ -452,7 +607,9 @@ def create_capsule(
         "rawBytes": len(data),
         "inputDigest": encoded.metadata["inputDigest"],
         "classification": encoded.metadata["classification"],
+        "planner": encoded.metadata["planner"],
         "strategy": encoded.metadata["strategy"],
+        "selectedPlanner": encoded.metadata["selectedPlanner"],
         "selectedModel": encoded.metadata["selectedModel"],
         "predictionModel": encoded.metadata["predictionModel"],
         "transforms": list(encoded.metadata["transforms"]),
@@ -477,6 +634,8 @@ def create_capsule(
             "inputDigest": encoded.metadata["inputDigest"],
             "artifactDigest": capsule["artifactDigest"],
             "chunkCount": len(capsule["chunkIndex"]),
+            "selectedPlanner": encoded.metadata["selectedPlanner"],
+            "selectedModel": encoded.metadata["selectedModel"],
             "recommendedForStorage": encoded.metadata["recommendedForStorage"],
             "adoptionDecision": encoded.metadata["adoptionDecision"],
         },
@@ -491,6 +650,7 @@ def create_capsule_file(
     capsule_path: str | Path,
     max_passes: int = 1,
     model: str = MODEL_NONE,
+    planner: str = PLANNER_GZIP,
     summary: str = "",
     tags: list[str] | None = None,
     chunk_size: int = 4096,
@@ -502,6 +662,7 @@ def create_capsule_file(
         capsule_path=capsule_path,
         max_passes=max_passes,
         model=model,
+        planner=planner,
         summary=summary,
         tags=tags,
         chunk_size=chunk_size,

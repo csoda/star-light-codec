@@ -23,13 +23,13 @@ Environment:
 - `chunkSize`: 4096
 - Timing: median of 9 measured runs after 2 warmup runs
 
-| fixture | raw bytes | gzip bytes | gzip+b64 chars | SLB1 bytes | model SLB1 | model | capsule bytes | SLB1 saved | model saved | capsule vs raw | decision | enc ms | dec ms | cap ms | chunk ms |
-| --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: |
-| repeated_text | 92,160 | 537 | 716 | 1,077 | 1,077 | none | 4,153 | 98.83% | 98.83% | 95.49% | use-artifact-for-storage | 10.904 | 0.165 | 11.173 | 0.166 |
-| json_logs | 105,984 | 2,746 | 3,664 | 2,908 | 2,908 | none | 4,580 | 97.26% | 97.26% | 95.68% | use-artifact-for-storage | 13.053 | 0.289 | 13.514 | 0.295 |
-| ramp_bytes | 65,536 | 597 | 796 | 1,244 | 1,128 | delta-prev-v1 | 3,126 | 98.10% | 98.28% | 95.23% | use-artifact-for-storage | 6.342 | 0.134 | 6.444 | 0.134 |
-| random_bytes | 65,536 | 65,574 | 87,432 | 66,392 | 66,392 | none | 3,114 | -1.31% | -1.31% | 95.25% | keep-original-for-storage | 7.714 | 0.131 | 8.004 | 0.133 |
-| already_compressed | 65,574 | 65,614 | 87,488 | 66,430 | 66,430 | none | 3,275 | -1.31% | -1.31% | 95.01% | keep-original-for-storage | 7.826 | 0.132 | 7.976 | 0.133 |
+| fixture | raw bytes | gzip bytes | gzip+b64 chars | SLB1 bytes | model SLB1 | strong SLB1 | planner | model | capsule bytes | SLB1 saved | strong saved | capsule vs raw | decision | enc ms | dec ms | cap ms | chunk ms |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: |
+| repeated_text | 92,160 | 537 | 716 | 1,094 | 1,094 | 1,094 | gzip | none | 4,195 | 98.81% | 98.81% | 95.45% | use-artifact-for-storage | 11.238 | 0.175 | 11.290 | 0.173 |
+| json_logs | 105,984 | 2,746 | 3,664 | 2,925 | 2,925 | 2,499 | stdlib-auto | none | 4,622 | 97.24% | 97.64% | 95.64% | use-artifact-for-storage | 13.304 | 0.308 | 13.642 | 0.321 |
+| ramp_bytes | 65,536 | 597 | 796 | 1,261 | 1,145 | 1,113 | stdlib-auto | delta-prev-v1 | 3,168 | 98.08% | 98.30% | 95.17% | use-artifact-for-storage | 6.459 | 0.144 | 6.488 | 0.146 |
+| random_bytes | 65,536 | 65,574 | 87,432 | 66,409 | 66,409 | 66,409 | gzip | none | 3,156 | -1.33% | -1.33% | 95.18% | keep-original-for-storage | 7.758 | 0.136 | 8.013 | 0.137 |
+| already_compressed | 65,574 | 65,614 | 87,488 | 66,447 | 66,447 | 66,447 | gzip | none | 3,317 | -1.33% | -1.33% | 94.94% | keep-original-for-storage | 7.886 | 0.137 | 8.054 | 0.138 |
 
 ## How To Read This
 
@@ -38,6 +38,10 @@ Environment:
 - `model SLB1` is the `--model auto` artifact size. The model column reports
   which deterministic prediction model was selected. `none` means auto kept the
   baseline artifact.
+- `strong SLB1` is the current strongest reference path:
+  `--planner stdlib-auto --model auto`. It compares whole artifacts, so it can
+  fall back to `gzip` when the stronger planner would only add metadata
+  overhead.
 - `capsule bytes` is the LLM-facing transport manifest size. It is not a
   substitute for storing the original bytes or artifact.
 - `capsule vs raw` estimates how much smaller the model-facing manifest is than
@@ -53,9 +57,10 @@ Environment:
 
 - Redundant text/log fixtures compress well as `SLB1`, with exact decode under
   1 ms in this local run.
-- The experimental `delta-prev-v1` model only won on `ramp_bytes`, reducing
-  `SLB1` from 1,244 bytes to 1,128 bytes in this run. It stayed off for text,
-  logs, random bytes, and already-compressed input.
+- `stdlib-auto` improved `json_logs` from 2,925 to 2,499 bytes, while
+  `delta-prev-v1` plus `stdlib-auto` improved `ramp_bytes` from 1,261 to 1,113
+  bytes in this run. It fell back to gzip for fixtures where metadata overhead
+  would erase the win.
 - High-entropy inputs are detected as storage non-winners. The artifact remains
   exact, but callers should keep the original for storage.
 - Capsule manifests stay small because they carry metadata, digests, tags, and a
@@ -94,6 +99,7 @@ The harness reports:
   plus optional `brotli` or `zstd` if installed;
 - baseline `SLB1` size;
 - `--model auto` `SLB1` size and selected prediction model;
+- strong `SLB1` size for `--planner stdlib-auto --model auto`;
 - exact decode verification status.
 
 Privacy and publication notes:
