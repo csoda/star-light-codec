@@ -180,12 +180,16 @@ contents は埋め込みません。
 python benchmarks\search_predictors.py README.md src tests `
   --label-root . `
   --search-mode adaptive `
-  --time-limit-seconds 30
+  --time-limit-seconds 30 `
+  --state-input benchmarks\results\predictor-state.json `
+  --state-output benchmarks\results\predictor-state.json
 ```
 
 この harness は実行中に小さく学習しながら、見込みのある決定的 predictor 候補を
 優先的に試します。各 candidate は exact round-trip を検証し、
 `--time-limit-seconds`、`--candidate-limit`、`--file-limit` で止まります。
+`--state-input` と `--state-output` を使うと、raw file contents を保存せずに
+集計済み報酬だけを次回へ持ち越せます。
 
 ## ロードマップ
 

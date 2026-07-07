@@ -127,6 +127,8 @@ python benchmarks\search_predictors.py README.md src tests `
   --label-root . `
   --search-mode adaptive `
   --time-limit-seconds 30 `
+  --state-input benchmarks\results\predictor-state.json `
+  --state-output benchmarks\results\predictor-state.json `
   --candidate-limit 64 `
   --file-limit 64
 ```
@@ -150,6 +152,9 @@ Safety limits:
 - `--candidate-limit` bounds candidate count.
 - `--file-limit` bounds corpus size.
 - `--max-file-bytes` skips large files.
+- `--state-input` and `--state-output` load/save the small learned controller
+  state between runs. The state contains aggregate reward counts only; it does
+  not embed raw file contents.
 
 Current candidate families are deliberately simple and lossless:
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -87,3 +88,42 @@ def test_exhaustive_mode_keeps_declared_order(tmp_path: Path) -> None:
         "identity+bz2",
         "identity+lzma",
     ]
+
+
+def test_predictor_search_state_round_trips_between_runs(tmp_path: Path) -> None:
+    search = load_search_predictors()
+    state_path = tmp_path / "predictor-state.json"
+    (tmp_path / "sample.txt").write_text("Star Light Codec\n" * 256, encoding="utf-8")
+
+    first = search.build_results(
+        search.SearchOptions(
+            paths=[tmp_path],
+            label_root=tmp_path,
+            candidate_limit=4,
+            time_limit_seconds=5.0,
+            state_output=state_path,
+        )
+    )
+    state_doc = json.loads(state_path.read_text(encoding="utf-8"))
+
+    assert first["stateOutput"]["written"] is True
+    assert state_doc["kind"] == search.STATE_KIND
+    assert state_doc["runCount"] == 1
+    assert state_doc["modelState"]
+
+    second = search.build_results(
+        search.SearchOptions(
+            paths=[tmp_path],
+            label_root=tmp_path,
+            candidate_limit=4,
+            time_limit_seconds=5.0,
+            state_input=state_path,
+            state_output=state_path,
+        )
+    )
+    updated_state = json.loads(state_path.read_text(encoding="utf-8"))
+
+    assert second["inputState"]["loaded"] is True
+    assert second["inputState"]["runCount"] == 1
+    assert updated_state["runCount"] == 2
+    assert updated_state["modelState"]

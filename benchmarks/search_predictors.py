@@ -14,6 +14,7 @@ import sys
 import time
 import zlib
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
@@ -36,6 +37,7 @@ from starlight_codec.codec import decode_slb1, encode_slb1, sha256_digest  # noq
 
 
 SEARCH_MAGIC = b"SLP1"
+STATE_KIND = "star-light-predictor-search-state"
 COMPRESSORS = ("gzip", "zlib", "bz2", "lzma")
 OFFSETS = (1, 2, 4, 8, 16)
 
@@ -64,6 +66,8 @@ class SearchOptions:
     min_improvement_pct: float = 1.0
     max_worst_regression_pct: float = 2.0
     include_file_results: bool = False
+    state_input: Path | None = None
+    state_output: Path | None = None
 
 
 def positive_float(value: str) -> float:
@@ -251,6 +255,75 @@ def stat_average(stats: dict[str, dict[str, float]], key: str) -> float:
 def stat_count(stats: dict[str, dict[str, float]], key: str) -> float:
     row = stats.get(key)
     return float(row["count"]) if row else 0.0
+
+
+def normalize_stats(raw: Any) -> dict[str, dict[str, float]]:
+    if not isinstance(raw, dict):
+        return {}
+    normalized: dict[str, dict[str, float]] = {}
+    for key, value in raw.items():
+        if not isinstance(key, str) or not isinstance(value, dict):
+            continue
+        try:
+            count = float(value.get("count", 0.0))
+            score = float(value.get("score", 0.0))
+        except (TypeError, ValueError):
+            continue
+        if count <= 0:
+            continue
+        normalized[key] = {"count": count, "score": score}
+    return normalized
+
+
+def summarize_stats(stats: dict[str, dict[str, float]]) -> dict[str, dict[str, float | int]]:
+    return {
+        key: {
+            "count": int(value["count"]),
+            "score": round(float(value["score"]), 6),
+            "averageReward": round(value["score"] / value["count"], 3) if value["count"] else 0.0,
+        }
+        for key, value in sorted(stats.items())
+    }
+
+
+def load_state(path: Path | None) -> tuple[dict[str, dict[str, float]], dict[str, Any]]:
+    if path is None:
+        return {}, {"loaded": False, "reason": "not-requested"}
+    state_path = path.resolve()
+    state_doc = json.loads(state_path.read_text(encoding="utf-8"))
+    if state_doc.get("kind") != STATE_KIND:
+        raise ValueError("Unsupported predictor search state file.")
+    stats = normalize_stats(state_doc.get("modelState", {}))
+    return stats, {
+        "loaded": True,
+        "keys": len(stats),
+        "runCount": int(state_doc.get("runCount", 0)),
+    }
+
+
+def write_state(
+    path: Path,
+    stats: dict[str, dict[str, float]],
+    results: dict[str, Any],
+    input_summary: dict[str, Any],
+) -> None:
+    previous_run_count = int(input_summary.get("runCount", 0)) if input_summary.get("loaded") else 0
+    state_doc = {
+        "schemaVersion": 1,
+        "kind": STATE_KIND,
+        "updatedAtUtc": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        "runCount": previous_run_count + 1,
+        "modelState": summarize_stats(stats),
+        "lastRun": {
+            "elapsedSeconds": results["elapsedSeconds"],
+            "searchMode": results["searchMode"],
+            "stoppedReason": results["stoppedReason"],
+            "fileCount": results["fileCount"],
+            "evaluatedCandidateCount": results["evaluatedCandidateCount"],
+        },
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state_doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def candidate_stat_keys(candidate: Candidate) -> list[str]:
@@ -518,7 +591,7 @@ def build_results(options: SearchOptions) -> dict[str, Any]:
     corpus = load_corpus(files, options)
     candidates = build_candidates(options.candidate_limit)
     pending = list(candidates)
-    stats: dict[str, dict[str, float]] = {}
+    stats, input_state_summary = load_state(options.state_input)
     selection_trace: list[dict[str, Any]] = []
     candidate_results: list[dict[str, Any]] = []
     stopped_reason = "complete"
@@ -560,7 +633,7 @@ def build_results(options: SearchOptions) -> dict[str, Any]:
             float(row["worstRegressionPct"]),
         ),
     )
-    return {
+    results = {
         "schemaVersion": 1,
         "benchmark": "star-light-codec-predictor-search",
         "resultLicense": "CC0-1.0",
@@ -582,17 +655,19 @@ def build_results(options: SearchOptions) -> dict[str, Any]:
             "maxWorstRegressionPct": options.max_worst_regression_pct,
         },
         "baseline": "SLB1 --planner stdlib-auto --model auto",
-        "modelState": {
-            key: {
-                "count": int(value["count"]),
-                "averageReward": round(value["score"] / value["count"], 3) if value["count"] else 0.0,
-            }
-            for key, value in sorted(stats.items())
-        },
+        "inputState": input_state_summary,
+        "stateOutputRequested": options.state_output is not None,
+        "modelState": summarize_stats(stats),
         "selectionTrace": selection_trace,
         "note": "Experimental local predictor search. No raw file contents are embedded in this result.",
         "candidates": ranked,
     }
+    if options.state_output is not None:
+        write_state(options.state_output, stats, results, input_state_summary)
+        results["stateOutput"] = {"written": True, "keys": len(stats)}
+    else:
+        results["stateOutput"] = {"written": False}
+    return results
 
 
 def markdown_table(results: dict[str, Any]) -> str:
@@ -643,6 +718,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--min-improvement-pct", type=non_negative_float, default=1.0)
     parser.add_argument("--max-worst-regression-pct", type=non_negative_float, default=2.0)
     parser.add_argument("--include-file-results", action="store_true")
+    parser.add_argument("--state-input", help="read persistent predictor model state from this JSON file")
+    parser.add_argument("--state-output", help="write updated predictor model state to this JSON file")
     parser.add_argument(
         "--exclude-glob",
         action="append",
@@ -676,6 +753,8 @@ def main(argv: list[str] | None = None) -> int:
         min_improvement_pct=args.min_improvement_pct,
         max_worst_regression_pct=args.max_worst_regression_pct,
         include_file_results=args.include_file_results,
+        state_input=Path(args.state_input) if args.state_input else None,
+        state_output=Path(args.state_output) if args.state_output else None,
     )
     results = build_results(options)
     if args.format == "json":

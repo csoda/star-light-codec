@@ -17,6 +17,8 @@
   `gzip`, `zlib`, `bz2`, and `lzma`.
 - Added a bounded adaptive predictor search harness for experimental lossless
   compression candidates.
+- Added persistent predictor search state input/output for carrying learned
+  aggregate rewards across local runs.
 
 ## 0.1.0
 

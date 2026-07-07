@@ -226,12 +226,16 @@ For automatic predictor exploration, use the bounded search harness:
 python benchmarks\search_predictors.py README.md src tests `
   --label-root . `
   --search-mode adaptive `
-  --time-limit-seconds 30
+  --time-limit-seconds 30 `
+  --state-input benchmarks\results\predictor-state.json `
+  --state-output benchmarks\results\predictor-state.json
 ```
 
 The search harness learns within the run, prioritizes promising deterministic
 predictor candidates, verifies exact round-trip, and stops at the configured
-time/candidate/file limits.
+time/candidate/file limits. `--state-input` and `--state-output` let the small
+controller carry aggregate rewards across runs without storing raw file
+contents.
 
 ## Name Check
 
