@@ -1407,7 +1407,7 @@ def decode_segmented_stream_var_oracle_payload(payload: bytes, compressor: str, 
     transform_codebook = list(header["segmentTransformCodebook"])
     output = bytearray()
     cursor = 0
-    for index, (length_code, transform_code) in enumerate(zip(length_codes, transform_codes, strict=True)):
+    for index, (length_code, transform_code) in enumerate(zip(length_codes, transform_codes)):
         if length_code >= len(length_codebook):
             raise ValueError("Segmented stream variable oracle length code out of codebook.")
         segment_bytes = length_codebook[length_code]
@@ -1474,7 +1474,7 @@ def decode_segmented_stream_boundary_oracle_payload(payload: bytes, compressor: 
     transform_codebook = list(header["segmentTransformCodebook"])
     output = bytearray()
     cursor = 0
-    for segment_bytes, transform_code in zip(segment_lengths, transform_codes, strict=True):
+    for segment_bytes, transform_code in zip(segment_lengths, transform_codes):
         if segment_bytes <= 0 or segment_bytes > maximum:
             raise ValueError("Segmented stream boundary oracle malformed segment length.")
         segment_end = cursor + segment_bytes
