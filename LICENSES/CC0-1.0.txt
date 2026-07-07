@@ -1,7 +1,8 @@
 Creative Commons Zero v1.0 Universal
 
-This repository uses CC0-1.0 for small fixtures, examples, and reusable
-metadata where explicitly noted.
+This repository uses CC0-1.0 for codec formats, compatibility profiles,
+schemas, transport capsule specs, test vectors, fixtures, sample metadata, and
+benchmark result data where explicitly noted or covered by LICENSING.md.
 
 Full license text:
 https://creativecommons.org/publicdomain/zero/1.0/legalcode

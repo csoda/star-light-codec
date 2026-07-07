@@ -1,6 +1,9 @@
 Creative Commons Attribution 4.0 International
 
-This repository uses CC BY 4.0 for documentation and specifications.
+This repository uses CC BY 4.0 for narrative documentation, README files, and
+roadmap text unless a file is explicitly marked otherwise. Codec formats,
+schemas, and interoperability specifications are covered by CC0-1.0 where
+marked or covered by LICENSING.md.
 
 Full license text:
 https://creativecommons.org/licenses/by/4.0/legalcode

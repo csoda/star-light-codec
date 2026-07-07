@@ -112,10 +112,11 @@ encryption track を追加していく予定です。
 
 ## ライセンス
 
-Star Light と同じ方針です。
+codec format を広く自由に再実装できるよう、format-first の方針です。
 
-- コード、スクリプト、テスト: Apache-2.0
-- ドキュメント、仕様、ロードマップ: CC BY 4.0
-- 小さなサンプル、fixture、再利用向けメタデータ: CC0-1.0
+- 参照実装コード、CLI、テスト、benchmark scripts: Apache-2.0
+- codec format、互換profile、schema、transport capsule spec、test vectors、
+  fixtures、sample metadata、benchmark result data: CC0-1.0
+- README、roadmap、説明文書: 明示がなければ CC BY 4.0
 
 詳細は [LICENSING.md](LICENSING.md) を参照してください。

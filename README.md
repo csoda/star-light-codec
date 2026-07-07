@@ -178,8 +178,10 @@ claiming media-codec-pack behavior.
 
 This repository follows the same policy as Star Light:
 
-- Code, scripts, and tests: Apache-2.0.
-- Documentation and specifications: CC BY 4.0.
-- Small examples, fixtures, and metadata intended for reuse: CC0-1.0.
+- Reference implementation code, CLI, tests, and benchmark scripts: Apache-2.0.
+- Codec format, compatibility profile, schemas, transport capsule spec, test
+  vectors, fixtures, sample metadata, and benchmark result data: CC0-1.0.
+- Narrative docs, README files, and roadmap text: CC BY 4.0 unless marked
+  otherwise.
 
 See [LICENSING.md](LICENSING.md).

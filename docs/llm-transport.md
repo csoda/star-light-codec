@@ -1,5 +1,7 @@
 # LLM Transport Capsules
 
+SPDX-License-Identifier: CC0-1.0
+
 Star Light Codec should not ask an LLM to understand gzip, base64, or opaque
 compressed bytes directly.
 

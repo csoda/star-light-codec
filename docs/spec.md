@@ -1,5 +1,7 @@
 # Star Light Codec Specification
 
+SPDX-License-Identifier: CC0-1.0
+
 This document describes the first public Star Light Codec artifact format:
 `SLB1`, using the `starlight-byte-exact` compatibility profile from Star Light.
 
