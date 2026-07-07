@@ -1,0 +1,7 @@
+Creative Commons Zero v1.0 Universal
+
+This repository uses CC0-1.0 for small fixtures, examples, and reusable
+metadata where explicitly noted.
+
+Full license text:
+https://creativecommons.org/publicdomain/zero/1.0/legalcode

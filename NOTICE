@@ -1,0 +1,7 @@
+Star Light Codec
+
+Copyright 2026 csoda
+
+This project extracts the experimental exact byte codec direction from
+codex-starlight into a small standalone reference implementation and
+specification.

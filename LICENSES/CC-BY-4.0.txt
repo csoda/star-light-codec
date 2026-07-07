@@ -1,0 +1,6 @@
+Creative Commons Attribution 4.0 International
+
+This repository uses CC BY 4.0 for documentation and specifications.
+
+Full license text:
+https://creativecommons.org/licenses/by/4.0/legalcode
