@@ -1,185 +1,255 @@
 {
   "kind": "star-light-predictor-search-state",
   "lastRun": {
-    "elapsedSeconds": 14.031,
-    "evaluatedCandidateCount": 32,
-    "fileCount": 23,
+    "elapsedSeconds": 40.031,
+    "evaluatedCandidateCount": 73,
+    "fileCount": 15,
     "searchMode": "adaptive",
-    "stoppedReason": "time-limit"
+    "stoppedReason": "complete"
   },
   "modelState": {
     "compressor:bz2": {
-      "averageReward": -92.867,
-      "count": 2443,
-      "score": -226872.898359
+      "averageReward": -96.103,
+      "count": 3025,
+      "score": -290712.211523
     },
     "compressor:gzip": {
-      "averageReward": -73.95,
-      "count": 2444,
-      "score": -180733.290517
+      "averageReward": -76.684,
+      "count": 3028,
+      "score": -232197.770825
     },
     "compressor:lzma": {
-      "averageReward": -69.898,
-      "count": 2445,
-      "score": -170899.514273
+      "averageReward": -72.465,
+      "count": 3029,
+      "score": -219496.233299
     },
     "compressor:zlib": {
-      "averageReward": -73.506,
-      "count": 2444,
-      "score": -179649.008058
+      "averageReward": -75.589,
+      "count": 3148,
+      "score": -237954.926818
     },
     "offset:delta-prev:1": {
-      "averageReward": -14.891,
-      "count": 816,
-      "score": -12150.6954
+      "averageReward": -15.884,
+      "count": 964,
+      "score": -15312.4677
     },
     "offset:delta-prev:16": {
-      "averageReward": -200.584,
-      "count": 812,
-      "score": -162874.09975
+      "averageReward": -204.668,
+      "count": 960,
+      "score": -196481.69145
     },
     "offset:delta-prev:2": {
-      "averageReward": -43.981,
-      "count": 816,
-      "score": -35888.255
+      "averageReward": -45.365,
+      "count": 964,
+      "score": -43731.91875
+    },
+    "offset:delta-prev:3": {
+      "averageReward": -79.533,
+      "count": 140,
+      "score": -11134.6084
+    },
+    "offset:delta-prev:36": {
+      "averageReward": -279.204,
+      "count": 12,
+      "score": -3350.4457
     },
     "offset:delta-prev:4": {
-      "averageReward": -85.349,
-      "count": 815,
-      "score": -69559.5573
+      "averageReward": -87.461,
+      "count": 963,
+      "score": -84224.54135
+    },
+    "offset:delta-prev:5": {
+      "averageReward": -117.118,
+      "count": 128,
+      "score": -14991.1547
     },
     "offset:delta-prev:8": {
-      "averageReward": -140.379,
-      "count": 812,
-      "score": -113988.0315
+      "averageReward": -143.306,
+      "count": 960,
+      "score": -137574.05165
     },
     "offset:xor-prev:1": {
-      "averageReward": -11.237,
-      "count": 816,
-      "score": -9169.17245
+      "averageReward": -12.144,
+      "count": 964,
+      "score": -11706.63435
     },
     "offset:xor-prev:16": {
-      "averageReward": -170.118,
-      "count": 812,
-      "score": -138135.73005
+      "averageReward": -173.792,
+      "count": 960,
+      "score": -166840.4616
     },
     "offset:xor-prev:2": {
-      "averageReward": -36.185,
-      "count": 816,
-      "score": -29526.99295
+      "averageReward": -37.515,
+      "count": 964,
+      "score": -36164.2718
+    },
+    "offset:xor-prev:3": {
+      "averageReward": -67.806,
+      "count": 140,
+      "score": -9492.83045
+    },
+    "offset:xor-prev:36": {
+      "averageReward": -239.316,
+      "count": 12,
+      "score": -2871.7957
     },
     "offset:xor-prev:4": {
-      "averageReward": -72.607,
-      "count": 816,
-      "score": -59246.9711
+      "averageReward": -74.54,
+      "count": 964,
+      "score": -71856.38825
+    },
+    "offset:xor-prev:5": {
+      "averageReward": -100.572,
+      "count": 126,
+      "score": -12672.13095
     },
     "offset:xor-prev:8": {
-      "averageReward": -119.451,
-      "count": 813,
-      "score": -97113.68245
+      "averageReward": -122.076,
+      "count": 961,
+      "score": -117315.31115
     },
     "pair:delta-avg2+bz2": {
-      "averageReward": -48.952,
-      "count": 204,
-      "score": -9986.12415
+      "averageReward": -50.315,
+      "count": 241,
+      "score": -12126.02865
     },
     "pair:delta-avg2+gzip": {
-      "averageReward": -39.476,
-      "count": 204,
-      "score": -8053.06445
+      "averageReward": -41.089,
+      "count": 241,
+      "score": -9902.43595
     },
     "pair:delta-avg2+lzma": {
-      "averageReward": -35.475,
-      "count": 204,
-      "score": -7236.83085
+      "averageReward": -36.724,
+      "count": 241,
+      "score": -8850.5646
     },
     "pair:delta-avg2+zlib": {
-      "averageReward": -38.969,
-      "count": 204,
-      "score": -7949.6585
+      "averageReward": -40.601,
+      "count": 241,
+      "score": -9784.9287
     },
     "pair:delta-prev+bz2": {
-      "averageReward": -114.487,
-      "count": 1017,
-      "score": -116433.2476
+      "averageReward": -117.517,
+      "count": 1272,
+      "score": -149482.0084
     },
     "pair:delta-prev+gzip": {
-      "averageReward": -92.935,
-      "count": 1018,
-      "score": -94608.0567
+      "averageReward": -95.515,
+      "count": 1273,
+      "score": -121590.42225
     },
     "pair:delta-prev+lzma": {
-      "averageReward": -87.665,
-      "count": 1018,
-      "score": -89242.6589
+      "averageReward": -90.076,
+      "count": 1273,
+      "score": -114667.19865
     },
     "pair:delta-prev+zlib": {
-      "averageReward": -92.511,
-      "count": 1018,
-      "score": -94176.67575
+      "averageReward": -95.099,
+      "count": 1273,
+      "score": -121061.2504
     },
     "pair:identity+bz2": {
-      "averageReward": 3.669,
-      "count": 204,
-      "score": 748.478986
+      "averageReward": 3.523,
+      "count": 241,
+      "score": 848.965773
     },
     "pair:identity+gzip": {
-      "averageReward": 3.05,
-      "count": 204,
-      "score": 622.201519
+      "averageReward": 2.907,
+      "count": 241,
+      "score": 700.641959
     },
     "pair:identity+lzma": {
-      "averageReward": 3.438,
-      "count": 204,
-      "score": 701.337778
+      "averageReward": 3.298,
+      "count": 241,
+      "score": 794.809354
     },
     "pair:identity+zlib": {
-      "averageReward": 3.197,
-      "count": 204,
-      "score": 652.136378
+      "averageReward": 3.045,
+      "count": 241,
+      "score": 733.901415
+    },
+    "pair:segmented-oracle+zlib": {
+      "averageReward": -248.525,
+      "count": 25,
+      "score": -6213.1265
+    },
+    "pair:segmented-stream-boundary-oracle+zlib": {
+      "averageReward": -33.806,
+      "count": 14,
+      "score": -473.28685
+    },
+    "pair:segmented-stream-oracle+zlib": {
+      "averageReward": -3.394,
+      "count": 64,
+      "score": -217.1877
+    },
+    "pair:segmented-stream-var-oracle+zlib": {
+      "averageReward": -8.894,
+      "count": 17,
+      "score": -151.1981
     },
     "pair:xor-prev+bz2": {
-      "averageReward": -99.413,
-      "count": 1018,
-      "score": -101202.0056
+      "averageReward": -102.245,
+      "count": 1271,
+      "score": -129953.14025
     },
     "pair:xor-prev+gzip": {
-      "averageReward": -77.303,
-      "count": 1018,
-      "score": -78694.3709
+      "averageReward": -79.659,
+      "count": 1273,
+      "score": -101405.5546
     },
     "pair:xor-prev+lzma": {
-      "averageReward": -73.721,
-      "count": 1019,
-      "score": -75121.3623
+      "averageReward": -75.96,
+      "count": 1274,
+      "score": -96773.2794
     },
     "pair:xor-prev+zlib": {
-      "averageReward": -76.793,
-      "count": 1018,
-      "score": -78174.8102
+      "averageReward": -79.173,
+      "count": 1273,
+      "score": -100787.85
     },
     "transform:delta-avg2": {
-      "averageReward": -40.718,
-      "count": 816,
-      "score": -33225.67795
+      "averageReward": -42.183,
+      "count": 964,
+      "score": -40663.9579
     },
     "transform:delta-prev": {
-      "averageReward": -96.895,
-      "count": 4071,
-      "score": -394460.63895
+      "averageReward": -99.548,
+      "count": 5091,
+      "score": -506800.8797
     },
     "transform:identity": {
-      "averageReward": 3.338,
-      "count": 816,
-      "score": 2724.154681
+      "averageReward": 3.193,
+      "count": 964,
+      "score": 3078.318516
+    },
+    "transform:segmented-oracle": {
+      "averageReward": -248.525,
+      "count": 25,
+      "score": -6213.1265
+    },
+    "transform:segmented-stream-boundary-oracle": {
+      "averageReward": -33.806,
+      "count": 14,
+      "score": -473.28685
+    },
+    "transform:segmented-stream-oracle": {
+      "averageReward": -3.394,
+      "count": 64,
+      "score": -217.1877
+    },
+    "transform:segmented-stream-var-oracle": {
+      "averageReward": -8.894,
+      "count": 17,
+      "score": -151.1981
     },
     "transform:xor-prev": {
-      "averageReward": -81.805,
-      "count": 4073,
-      "score": -333192.549
+      "averageReward": -84.251,
+      "count": 5091,
+      "score": -428919.82425
     }
   },
-  "runCount": 204,
+  "runCount": 241,
   "schemaVersion": 1,
-  "updatedAtUtc": "2026-07-07T09:04:37+00:00"
+  "updatedAtUtc": "2026-07-07T13:56:00+00:00"
 }

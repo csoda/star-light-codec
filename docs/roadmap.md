@@ -36,6 +36,16 @@ Status: planned.
 - Select transforms by data shape.
 - Add a no-benefit fast path for random or already-compressed data.
 - Keep decoder-compatible transforms stable where possible.
+- Prototype optional fixed CDF oracle profiles as standalone experiments before
+  considering any production `SLB1` integration.
+- Use `byte-ppm-context-v0` as the first stronger deterministic CDF engine
+  while keeping random/already-compressed data behind a benefit gate or exact
+  fallback before production use.
+- Keep the first benefit gate standalone as `cdf pack/open`: compare stored,
+  deterministic `zlib`, and CDF oracle candidates by whole package size before
+  considering any `SLB1` integration.
+- Define a CDF profile registry before any model-backed profile is promoted, so
+  profile IDs, hashes, lifetimes, resources, and fallbacks are explicit.
 
 ## R4. Chunking And Dictionaries
 

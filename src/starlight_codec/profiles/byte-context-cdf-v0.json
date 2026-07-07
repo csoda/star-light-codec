@@ -1,0 +1,76 @@
+{
+  "schema": "slc-cdf-profile-registry-v0",
+  "canonicalJson": "slc-canonical-json-v0",
+  "profileId": "byte-context-cdf-v0",
+  "profileVersion": 0,
+  "profileClass": "stream-small",
+  "status": "experimental",
+  "profileHash": "sha256:88860917d2a45a89d95277d48cf91f788e198940fb3a0644992c87f93fbf163c",
+  "descriptorDigest": "sha256:9d14c4d5211e2dfd2df3addda855b24a5dd99fe7164b6a33c2464b1928a9cf84",
+  "availability": "public-registry",
+  "decodeContract": {
+    "oracleKind": "byte-context-counts-v0",
+    "symbolAlphabet": "byte256",
+    "context": {
+      "unit": "byte",
+      "maxContextBytes": 64,
+      "slicing": "trailing-decoded-bytes"
+    },
+    "frequencyModel": {
+      "modelId": "byte-counts-plus-one-v0",
+      "baseFrequency": 1,
+      "countSource": "decodedTrailingContext",
+      "countScale": 1
+    },
+    "frequencyToCdf": {
+      "cdfTotal": 65536,
+      "minimumSymbolFrequency": 1,
+      "quantization": "floor-proportional-min1-remainder-desc-byte-asc",
+      "tieBreak": "byte-ascending"
+    },
+    "entropyCoder": {
+      "coderId": "integer-arithmetic-range-v0",
+      "stateBits": 32,
+      "flushRule": "pending-bits-final-quarter-v0"
+    },
+    "resourceLimits": {
+      "maxContextBytes": 64,
+      "maxSymbolAlphabetSize": 256,
+      "maxDecoderStateBits": 32,
+      "maxDecodeMemoryBytes": 1048576,
+      "maxProfileBytes": 65536,
+      "maxPayloadExpansionRatio": 1024,
+      "streaming": true
+    },
+    "goldenVectors": [
+      {
+        "name": "empty",
+        "inputDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "payloadDigest": "sha256:c3641f8544d7c02f3580b07c0f9887f0c6a27ff5ab1d4a3e29caf197cfc299ae",
+        "decodedDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "payloadBytes": 1,
+        "encodedBitLength": 2
+      }
+    ]
+  },
+  "distribution": {
+    "primaryUri": "profiles/byte-context-cdf-v0.json",
+    "assetUris": [],
+    "license": "Apache-2.0",
+    "publishedAt": "2026-07-08",
+    "retainUntil": "2027-07-08"
+  },
+  "compatibility": {
+    "containers": [],
+    "supersedes": [],
+    "notCompatibleWith": []
+  },
+  "security": {
+    "secretProfile": false,
+    "attackerControlledInputWarning": true,
+    "notes": "Compression is not encryption."
+  },
+  "fallback": {
+    "mode": "none"
+  }
+}

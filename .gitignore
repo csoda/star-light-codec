@@ -11,3 +11,5 @@ build/
 benchmarks/results/*.log
 benchmarks/results/*-status.json
 benchmarks/results/*-history.jsonl
+benchmarks/results/predictor-*-20*.json
+benchmarks/results/predictor-*-20*.md

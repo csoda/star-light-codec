@@ -156,6 +156,11 @@ Safety limits:
   state between runs. The state contains aggregate reward counts only; it does
   not embed raw file contents.
 
+Focused candidate filters are useful after a promising result appears. Use
+`--candidate-filter segmented-stream-oracle-4096+zlib` for a fast single
+follow-up, or `--candidate-filter segmented-stream-oracle-*+zlib` to compare the
+fixed segmented-stream sweep. Multiple filters are ORed.
+
 Current candidate families are deliberately simple and lossless:
 
 - `identity+compressor` controls;
@@ -173,11 +178,23 @@ Current local background result:
   [benchmarks/results/predictor-search-background-latest.json](benchmarks/results/predictor-search-background-latest.json)
 - Learned controller state:
   [benchmarks/results/predictor-state.json](benchmarks/results/predictor-state.json)
-- Run shape: 204 bounded iterations, 23 files, 32 evaluated candidates in the
-  final slice.
-- Current best whole-corpus candidates were `identity+bz2` and `identity+lzma`,
-  both about 14% smaller than the previous `SLB1 --planner stdlib-auto --model
-  auto` baseline in this local run.
-- Predictor transforms such as `xor-prev` and `delta-prev` showed strong wins on
-  individual files, but they did not beat the whole-corpus promotion threshold
-  yet. Keep them in research, not the default production encoder.
+- Predictor-search experiment notes:
+  [benchmarks/results/predictor-search-summary.md](benchmarks/results/predictor-search-summary.md)
+- Run shape: a complete adaptive local run over 15 files with 73 evaluated
+  candidates.
+- The current top research candidate is
+  `segmented-stream-oracle-1024-4096-project-text-gated+zlib`, at 1.780%
+  aggregate improvement versus the previous `SLB1 --planner stdlib-auto
+  --model auto` baseline in this local run. It is still a watch candidate, not a
+  promoted production encoder.
+- `identity+lzma` and `identity+bz2` remain useful control baselines at 9.680%
+  and 9.550% aggregate improvement respectively. They are marked
+  `control-baseline`, not promoted as predictor transforms.
+- Predictor transforms such as `xor-prev`, `delta-prev`, and segmented-stream
+  probes showed targeted wins, but they did not beat the whole-corpus promotion
+  threshold yet. Keep them in research, not the default production encoder.
+- In the focused segmented-stream batch experiments, the benefit-gated
+  1024/2048/4096 selector beat the fixed selector on average, while the
+  long-token intern pre-transform did not improve the batch average. Keep the
+  selector path in research and treat long-token interning as an unpromoted
+  probe until a narrower corpus justifies it.
