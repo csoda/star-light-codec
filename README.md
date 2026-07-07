@@ -270,6 +270,18 @@ time/candidate/file limits. `--state-input` and `--state-output` let the small
 controller carry aggregate rewards across runs without storing raw file
 contents.
 
+After a promising candidate appears, run a fast focused experiment with
+`--candidate-filter`:
+
+```powershell
+python benchmarks\search_predictors.py README.md src tests `
+  --label-root . `
+  --search-mode exhaustive `
+  --time-limit-seconds 30 `
+  --candidate-limit 64 `
+  --candidate-filter segmented-stream-oracle-4096+zlib
+```
+
 ## Name Check
 
 The project name is **Star Light Codec**. A quick public search found nearby

@@ -1,982 +1,2101 @@
 {
   "baseline": "SLB1 --planner stdlib-auto --model auto",
   "benchmark": "star-light-codec-predictor-search",
-  "candidateCount": 48,
+  "candidateCount": 73,
+  "candidateFilterMatchCount": 73,
+  "candidateFilters": [],
   "candidateLimit": 64,
+  "candidateLimitMode": "soft-research-probes",
   "candidates": [
     {
-      "aggregateImprovementPct": 0.0,
-      "baselineBytes": 0,
-      "bestFileGainPct": 0.0,
-      "candidate": "delta-prev-4+gzip",
-      "candidateBytes": 0,
-      "complete": false,
-      "compressor": "gzip",
-      "decision": "incomplete",
-      "encodeDecodeMedianMs": 0.0,
-      "evaluatedFiles": 0,
+      "aggregateImprovementPct": 1.78,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 19.39,
+      "candidate": "segmented-stream-oracle-1024-4096-project-text-gated+zlib",
+      "candidateBytes": 62024,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "watch-candidate",
+      "encodeDecodeMedianMs": 3.405,
+      "evaluatedFiles": 15,
+      "gate": {
+        "id": "project-text",
+        "name": "project-text-code-ish-v1"
+      },
+      "gateAppliedFiles": 12,
+      "gateSkippedFiles": 3,
       "params": {
-        "offset": 4
+        "maxBlockSize": 4096,
+        "minBlockSize": 1024
       },
       "roundTripFailures": 0,
-      "selectionScore": -406.266,
-      "transform": "delta-prev",
-      "worstRegressionPct": 0.0
+      "selectedBlockSizes": {
+        "1024": 5,
+        "2048": 2,
+        "4096": 5
+      },
+      "selectionScore": -81.349,
+      "transform": "segmented-stream-oracle",
+      "worstRegressionPct": 3.48
+    },
+    {
+      "aggregateImprovementPct": 1.42,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 17.37,
+      "candidate": "segmented-stream-oracle-4096-project-text-gated+zlib",
+      "candidateBytes": 62252,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "watch-candidate",
+      "encodeDecodeMedianMs": 1.193,
+      "evaluatedFiles": 15,
+      "gate": {
+        "id": "project-text",
+        "name": "project-text-code-ish-v1"
+      },
+      "gateAppliedFiles": 12,
+      "gateSkippedFiles": 3,
+      "params": {
+        "blockSize": 4096
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -81.469,
+      "transform": "segmented-stream-oracle",
+      "worstRegressionPct": 3.7
+    },
+    {
+      "aggregateImprovementPct": 0.3,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 19.39,
+      "candidate": "segmented-stream-oracle-4096+zlib",
+      "candidateBytes": 62955,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "watch-candidate",
+      "encodeDecodeMedianMs": 2.206,
+      "evaluatedFiles": 15,
+      "params": {
+        "blockSize": 4096
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -81.469,
+      "transform": "segmented-stream-oracle",
+      "worstRegressionPct": 8.74
+    },
+    {
+      "aggregateImprovementPct": 0.19,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 19.39,
+      "candidate": "segmented-stream-oracle-2048+zlib",
+      "candidateBytes": 63027,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "watch-candidate",
+      "encodeDecodeMedianMs": 2.282,
+      "evaluatedFiles": 15,
+      "params": {
+        "blockSize": 2048
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -81.462,
+      "transform": "segmented-stream-oracle",
+      "worstRegressionPct": 8.91
+    },
+    {
+      "aggregateImprovementPct": -0.07,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 19.39,
+      "candidate": "segmented-stream-oracle-1024+zlib",
+      "candidateBytes": 63191,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.429,
+      "evaluatedFiles": 15,
+      "params": {
+        "blockSize": 1024
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -81.439,
+      "transform": "segmented-stream-oracle",
+      "worstRegressionPct": 9.26
     },
     {
       "aggregateImprovementPct": -1.18,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 49.88,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 19.7,
+      "candidate": "segmented-stream-oracle-512+zlib",
+      "candidateBytes": 63892,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.589,
+      "evaluatedFiles": 15,
+      "params": {
+        "blockSize": 512
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -81.309,
+      "transform": "segmented-stream-oracle",
+      "worstRegressionPct": 13.07
+    },
+    {
+      "aggregateImprovementPct": -3.58,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 3.07,
+      "candidate": "segmented-stream-var-oracle-512-4096+zlib",
+      "candidateBytes": 65409,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 26.004,
+      "evaluatedFiles": 15,
+      "params": {
+        "maxSegmentBytes": 4096,
+        "minSegmentBytes": 512
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -92.095,
+      "transform": "segmented-stream-var-oracle",
+      "worstRegressionPct": 10.07
+    },
+    {
+      "aggregateImprovementPct": -6.92,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 43.22,
       "candidate": "xor-prev-1+lzma",
-      "candidateBytes": 66892,
+      "candidateBytes": 67517,
       "complete": true,
       "compressor": "lzma",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 12.759,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 17.256,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 1
       },
       "roundTripFailures": 0,
-      "selectionScore": -255.101,
+      "selectionScore": -263.796,
       "transform": "xor-prev",
-      "worstRegressionPct": 13.94
+      "worstRegressionPct": 15.5
     },
     {
-      "aggregateImprovementPct": -2.17,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.8,
-      "candidate": "xor-prev-1+zlib",
-      "candidateBytes": 67549,
-      "complete": true,
-      "compressor": "zlib",
-      "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.315,
-      "evaluatedFiles": 23,
-      "params": {
-        "offset": 1
-      },
-      "roundTripFailures": 0,
-      "selectionScore": -260.609,
-      "transform": "xor-prev",
-      "worstRegressionPct": 23.38
-    },
-    {
-      "aggregateImprovementPct": -2.59,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 51.29,
-      "candidate": "xor-prev-1+gzip",
-      "candidateBytes": 67828,
-      "complete": true,
-      "compressor": "gzip",
-      "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.216,
-      "evaluatedFiles": 23,
-      "params": {
-        "offset": 1
-      },
-      "roundTripFailures": 0,
-      "selectionScore": -261.783,
-      "transform": "xor-prev",
-      "worstRegressionPct": 23.8
-    },
-    {
-      "aggregateImprovementPct": -3.52,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 49.42,
+      "aggregateImprovementPct": -9.46,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.8,
       "candidate": "delta-prev-1+lzma",
-      "candidateBytes": 68444,
+      "candidateBytes": 69121,
       "complete": true,
       "compressor": "lzma",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 16.055,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 15.643,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 1
       },
       "roundTripFailures": 0,
-      "selectionScore": -293.904,
+      "selectionScore": -303.236,
       "transform": "delta-prev",
-      "worstRegressionPct": 16.04
+      "worstRegressionPct": 17.44
     },
     {
-      "aggregateImprovementPct": -5.48,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.34,
-      "candidate": "delta-prev-1+zlib",
-      "candidateBytes": 69736,
+      "aggregateImprovementPct": -9.54,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 48.73,
+      "candidate": "xor-prev-1+zlib",
+      "candidateBytes": 69168,
       "complete": true,
       "compressor": "zlib",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.312,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 1.683,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 1
       },
       "roundTripFailures": 0,
-      "selectionScore": -301.153,
-      "transform": "delta-prev",
-      "worstRegressionPct": 22.96
+      "selectionScore": -268.807,
+      "transform": "xor-prev",
+      "worstRegressionPct": 25.21
     },
     {
-      "aggregateImprovementPct": -5.9,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 50.82,
-      "candidate": "delta-prev-1+gzip",
-      "candidateBytes": 70015,
+      "aggregateImprovementPct": -9.82,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.46,
+      "candidate": "xor-prev-1+gzip",
+      "candidateBytes": 69349,
       "complete": true,
       "compressor": "gzip",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.348,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 1.711,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 1
       },
       "roundTripFailures": 0,
-      "selectionScore": -302.318,
-      "transform": "delta-prev",
-      "worstRegressionPct": 23.38
+      "selectionScore": -270.655,
+      "transform": "xor-prev",
+      "worstRegressionPct": 25.3
     },
     {
-      "aggregateImprovementPct": -7.25,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.22,
+      "aggregateImprovementPct": -11.08,
+      "baselineBytes": 63146,
+      "bestFileGainPct": -7.38,
+      "candidate": "segmented-stream-boundary-oracle-512-4096+zlib",
+      "candidateBytes": 70143,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 162.785,
+      "evaluatedFiles": 15,
+      "params": {
+        "maxSegmentBytes": 4096,
+        "minSegmentBytes": 512
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -142.029,
+      "transform": "segmented-stream-boundary-oracle",
+      "worstRegressionPct": 29.13
+    },
+    {
+      "aggregateImprovementPct": -12.24,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 45.02,
       "candidate": "xor-prev-1+bz2",
-      "candidateBytes": 70906,
+      "candidateBytes": 70874,
       "complete": true,
       "compressor": "bz2",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.786,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 2.676,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 1
       },
       "roundTripFailures": 0,
-      "selectionScore": -303.169,
+      "selectionScore": -313.023,
       "transform": "xor-prev",
-      "worstRegressionPct": 22.06
+      "worstRegressionPct": 20.09
     },
     {
-      "aggregateImprovementPct": -8.77,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 51.75,
+      "aggregateImprovementPct": -13.19,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.88,
+      "candidate": "delta-prev-1+zlib",
+      "candidateBytes": 71478,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.895,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 1
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -310.055,
+      "transform": "delta-prev",
+      "worstRegressionPct": 28.39
+    },
+    {
+      "aggregateImprovementPct": -13.48,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 46.5,
+      "candidate": "delta-prev-1+gzip",
+      "candidateBytes": 71659,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.946,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 1
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -311.832,
+      "transform": "delta-prev",
+      "worstRegressionPct": 28.48
+    },
+    {
+      "aggregateImprovementPct": -13.74,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 43.33,
       "candidate": "delta-prev-1+bz2",
-      "candidateBytes": 71911,
+      "candidateBytes": 71823,
       "complete": true,
       "compressor": "bz2",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.96,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 3.007,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 1
       },
       "roundTripFailures": 0,
-      "selectionScore": -343.07,
+      "selectionScore": -353.626,
       "transform": "delta-prev",
-      "worstRegressionPct": 18.45
+      "worstRegressionPct": 21.75
     },
     {
-      "aggregateImprovementPct": -13.93,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 49.88,
+      "aggregateImprovementPct": -22.58,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 43.22,
       "candidate": "xor-prev-2+lzma",
-      "candidateBytes": 75325,
+      "candidateBytes": 77402,
       "complete": true,
       "compressor": "lzma",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 14.472,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 16.013,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 2
       },
       "roundTripFailures": 0,
-      "selectionScore": -291.563,
+      "selectionScore": -301.306,
       "transform": "xor-prev",
-      "worstRegressionPct": 34.4
+      "worstRegressionPct": 35.45
     },
     {
-      "aggregateImprovementPct": -14.85,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.8,
+      "aggregateImprovementPct": -24.79,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 48.41,
       "candidate": "xor-prev-2+zlib",
-      "candidateBytes": 75931,
+      "candidateBytes": 78801,
       "complete": true,
       "compressor": "zlib",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.195,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 1.692,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 2
       },
       "roundTripFailures": 0,
-      "selectionScore": -297.077,
+      "selectionScore": -306.327,
       "transform": "xor-prev",
-      "worstRegressionPct": 37.7
+      "worstRegressionPct": 45.86
     },
     {
-      "aggregateImprovementPct": -15.27,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 51.29,
+      "aggregateImprovementPct": -25.08,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.03,
       "candidate": "xor-prev-2+gzip",
-      "candidateBytes": 76210,
+      "candidateBytes": 78982,
       "complete": true,
       "compressor": "gzip",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.241,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 1.719,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 2
       },
       "roundTripFailures": 0,
-      "selectionScore": -298.25,
+      "selectionScore": -308.18,
       "transform": "xor-prev",
-      "worstRegressionPct": 37.84
+      "worstRegressionPct": 45.94
     },
     {
-      "aggregateImprovementPct": -16.44,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 50.82,
+      "aggregateImprovementPct": -25.65,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 44.07,
       "candidate": "delta-avg2+lzma",
-      "candidateBytes": 76985,
+      "candidateBytes": 79346,
       "complete": true,
       "compressor": "lzma",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 13.924,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 16.192,
+      "evaluatedFiles": 15,
       "params": {},
       "roundTripFailures": 0,
-      "selectionScore": -182.065,
+      "selectionScore": -190.966,
       "transform": "delta-avg2",
-      "worstRegressionPct": 37.6
+      "worstRegressionPct": 38.21
     },
     {
-      "aggregateImprovementPct": -18.68,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 53.74,
-      "candidate": "delta-avg2+zlib",
-      "candidateBytes": 78463,
-      "complete": true,
-      "compressor": "zlib",
-      "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.955,
-      "evaluatedFiles": 23,
-      "params": {},
-      "roundTripFailures": 0,
-      "selectionScore": -187.973,
-      "transform": "delta-avg2",
-      "worstRegressionPct": 42.68
-    },
-    {
-      "aggregateImprovementPct": -19.1,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.22,
-      "candidate": "delta-avg2+gzip",
-      "candidateBytes": 78742,
-      "complete": true,
-      "compressor": "gzip",
-      "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.947,
-      "evaluatedFiles": 23,
-      "params": {},
-      "roundTripFailures": 0,
-      "selectionScore": -189.157,
-      "transform": "delta-avg2",
-      "worstRegressionPct": 42.83
-    },
-    {
-      "aggregateImprovementPct": -19.12,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 49.42,
+      "aggregateImprovementPct": -28.18,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.8,
       "candidate": "delta-prev-2+lzma",
-      "candidateBytes": 78758,
+      "candidateBytes": 80938,
       "complete": true,
       "compressor": "lzma",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 17.606,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 17.842,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 2
       },
       "roundTripFailures": 0,
-      "selectionScore": -336.709,
+      "selectionScore": -347.401,
       "transform": "delta-prev",
-      "worstRegressionPct": 39.66
+      "worstRegressionPct": 40.41
     },
     {
-      "aggregateImprovementPct": -20.01,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.34,
-      "candidate": "delta-prev-2+zlib",
-      "candidateBytes": 79343,
+      "aggregateImprovementPct": -30.03,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 48.94,
+      "candidate": "delta-avg2+zlib",
+      "candidateBytes": 82107,
       "complete": true,
       "compressor": "zlib",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.32,
-      "evaluatedFiles": 23,
-      "params": {
-        "offset": 2
-      },
+      "encodeDecodeMedianMs": 2.797,
+      "evaluatedFiles": 15,
+      "params": {},
       "roundTripFailures": 0,
-      "selectionScore": -343.944,
-      "transform": "delta-prev",
-      "worstRegressionPct": 43.27
+      "selectionScore": -196.649,
+      "transform": "delta-avg2",
+      "worstRegressionPct": 51.33
     },
     {
-      "aggregateImprovementPct": -20.43,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 50.82,
-      "candidate": "delta-prev-2+gzip",
-      "candidateBytes": 79622,
+      "aggregateImprovementPct": -30.31,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.56,
+      "candidate": "delta-avg2+gzip",
+      "candidateBytes": 82288,
       "complete": true,
       "compressor": "gzip",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.35,
-      "evaluatedFiles": 23,
-      "params": {
-        "offset": 2
-      },
+      "encodeDecodeMedianMs": 2.761,
+      "evaluatedFiles": 15,
+      "params": {},
       "roundTripFailures": 0,
-      "selectionScore": -345.11,
-      "transform": "delta-prev",
-      "worstRegressionPct": 43.41
+      "selectionScore": -198.516,
+      "transform": "delta-avg2",
+      "worstRegressionPct": 51.42
     },
     {
-      "aggregateImprovementPct": -25.76,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.22,
-      "candidate": "xor-prev-2+bz2",
-      "candidateBytes": 83146,
+      "aggregateImprovementPct": -30.62,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.67,
+      "candidate": "delta-prev-2+zlib",
+      "candidateBytes": 82481,
       "complete": true,
-      "compressor": "bz2",
+      "compressor": "zlib",
       "decision": "reject-no-gain",
       "encodeDecodeMedianMs": 1.885,
-      "evaluatedFiles": 23,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 2
       },
       "roundTripFailures": 0,
-      "selectionScore": -339.63,
-      "transform": "xor-prev",
-      "worstRegressionPct": 46.97
-    },
-    {
-      "aggregateImprovementPct": -26.55,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 53.15,
-      "candidate": "delta-avg2+bz2",
-      "candidateBytes": 83671,
-      "complete": true,
-      "compressor": "bz2",
-      "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 2.64,
-      "evaluatedFiles": 23,
-      "params": {},
-      "roundTripFailures": 0,
-      "selectionScore": -217.941,
-      "transform": "delta-avg2",
-      "worstRegressionPct": 45.72
-    },
-    {
-      "aggregateImprovementPct": -30.87,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 51.75,
-      "candidate": "delta-prev-2+bz2",
-      "candidateBytes": 86522,
-      "complete": true,
-      "compressor": "bz2",
-      "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 2.049,
-      "evaluatedFiles": 23,
-      "params": {
-        "offset": 2
-      },
-      "roundTripFailures": 0,
-      "selectionScore": -385.848,
+      "selectionScore": -354.219,
       "transform": "delta-prev",
-      "worstRegressionPct": 50.34
+      "worstRegressionPct": 51.58
     },
     {
-      "aggregateImprovementPct": -31.68,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 49.88,
-      "candidate": "xor-prev-4+lzma",
-      "candidateBytes": 87058,
-      "complete": true,
-      "compressor": "lzma",
-      "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 13.938,
-      "evaluatedFiles": 23,
-      "params": {
-        "offset": 4
-      },
-      "roundTripFailures": 0,
-      "selectionScore": -343.725,
-      "transform": "xor-prev",
-      "worstRegressionPct": 64.72
-    },
-    {
-      "aggregateImprovementPct": -34.16,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.8,
-      "candidate": "xor-prev-4+zlib",
-      "candidateBytes": 88699,
-      "complete": true,
-      "compressor": "zlib",
-      "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.196,
-      "evaluatedFiles": 23,
-      "params": {
-        "offset": 4
-      },
-      "roundTripFailures": 0,
-      "selectionScore": -349.24,
-      "transform": "xor-prev",
-      "worstRegressionPct": 69.42
-    },
-    {
-      "aggregateImprovementPct": -34.58,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 51.29,
-      "candidate": "xor-prev-4+gzip",
-      "candidateBytes": 88978,
+      "aggregateImprovementPct": -30.91,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 46.29,
+      "candidate": "delta-prev-2+gzip",
+      "candidateBytes": 82662,
       "complete": true,
       "compressor": "gzip",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.385,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 1.924,
+      "evaluatedFiles": 15,
       "params": {
-        "offset": 4
+        "offset": 2
       },
       "roundTripFailures": 0,
-      "selectionScore": -350.421,
-      "transform": "xor-prev",
-      "worstRegressionPct": 69.56
+      "selectionScore": -355.999,
+      "transform": "delta-prev",
+      "worstRegressionPct": 51.67
     },
     {
-      "aggregateImprovementPct": -39.36,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 49.42,
-      "candidate": "delta-prev-4+lzma",
-      "candidateBytes": 92138,
+      "aggregateImprovementPct": -34.94,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.48,
+      "candidate": "future-xor-prev-3+lzma",
+      "candidateBytes": 85208,
       "complete": true,
       "compressor": "lzma",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 13.379,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 16.323,
+      "evaluatedFiles": 15,
       "params": {
-        "offset": 4
+        "offset": 3
       },
       "roundTripFailures": 0,
-      "selectionScore": -397.837,
-      "transform": "delta-prev",
-      "worstRegressionPct": 73.13
+      "selectionScore": -340.778,
+      "transform": "xor-prev",
+      "worstRegressionPct": 51.92
     },
     {
-      "aggregateImprovementPct": -42.52,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.34,
-      "candidate": "delta-prev-4+zlib",
-      "candidateBytes": 94229,
-      "complete": true,
-      "compressor": "zlib",
-      "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.356,
-      "evaluatedFiles": 23,
-      "params": {
-        "offset": 4
-      },
-      "roundTripFailures": 0,
-      "selectionScore": -405.091,
-      "transform": "delta-prev",
-      "worstRegressionPct": 79.15
-    },
-    {
-      "aggregateImprovementPct": -48.63,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.22,
-      "candidate": "xor-prev-4+bz2",
-      "candidateBytes": 98264,
+      "aggregateImprovementPct": -35.25,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 44.6,
+      "candidate": "xor-prev-2+bz2",
+      "candidateBytes": 85403,
       "complete": true,
       "compressor": "bz2",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 1.97,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 2.707,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 2
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -350.529,
+      "transform": "xor-prev",
+      "worstRegressionPct": 48.44
+    },
+    {
+      "aggregateImprovementPct": -36.21,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 44.17,
+      "candidate": "delta-avg2+bz2",
+      "candidateBytes": 86012,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 3.904,
+      "evaluatedFiles": 15,
+      "params": {},
+      "roundTripFailures": 0,
+      "selectionScore": -227.593,
+      "transform": "delta-avg2",
+      "worstRegressionPct": 47.03
+    },
+    {
+      "aggregateImprovementPct": -38.03,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.67,
+      "candidate": "future-xor-prev-3+zlib",
+      "candidateBytes": 87159,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.708,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 3
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -345.763,
+      "transform": "xor-prev",
+      "worstRegressionPct": 64.4
+    },
+    {
+      "aggregateImprovementPct": -38.31,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 46.29,
+      "candidate": "future-xor-prev-3+gzip",
+      "candidateBytes": 87340,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.756,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 3
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -347.628,
+      "transform": "xor-prev",
+      "worstRegressionPct": 64.49
+    },
+    {
+      "aggregateImprovementPct": -40.11,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 41.84,
+      "candidate": "delta-prev-2+bz2",
+      "candidateBytes": 88474,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 3.121,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 2
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -397.776,
+      "transform": "delta-prev",
+      "worstRegressionPct": 50.29
+    },
+    {
+      "aggregateImprovementPct": -42.32,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.06,
+      "candidate": "future-delta-prev-3+lzma",
+      "candidateBytes": 89872,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 17.916,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 3
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -393.109,
+      "transform": "delta-prev",
+      "worstRegressionPct": 58.97
+    },
+    {
+      "aggregateImprovementPct": -44.72,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 43.22,
+      "candidate": "xor-prev-4+lzma",
+      "candidateBytes": 91387,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 17.311,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 4
       },
       "roundTripFailures": 0,
-      "selectionScore": -391.806,
+      "selectionScore": -354.212,
       "transform": "xor-prev",
-      "worstRegressionPct": 89.27
+      "worstRegressionPct": 65.82
     },
     {
-      "aggregateImprovementPct": -53.68,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 49.88,
-      "candidate": "xor-prev-8+lzma",
-      "candidateBytes": 101606,
+      "aggregateImprovementPct": -46.14,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 46.93,
+      "candidate": "future-delta-prev-3+zlib",
+      "candidateBytes": 92280,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.876,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 3
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -399.893,
+      "transform": "delta-prev",
+      "worstRegressionPct": 73.18
+    },
+    {
+      "aggregateImprovementPct": -46.42,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 45.55,
+      "candidate": "future-delta-prev-3+gzip",
+      "candidateBytes": 92461,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.865,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 3
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -401.692,
+      "transform": "delta-prev",
+      "worstRegressionPct": 73.27
+    },
+    {
+      "aggregateImprovementPct": -48.08,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 48.41,
+      "candidate": "xor-prev-4+zlib",
+      "candidateBytes": 93508,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.75,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -359.256,
+      "transform": "xor-prev",
+      "worstRegressionPct": 78.81
+    },
+    {
+      "aggregateImprovementPct": -48.37,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.03,
+      "candidate": "xor-prev-4+gzip",
+      "candidateBytes": 93689,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.719,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -361.117,
+      "transform": "xor-prev",
+      "worstRegressionPct": 78.9
+    },
+    {
+      "aggregateImprovementPct": -52.67,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 43.75,
+      "candidate": "future-xor-prev-3+bz2",
+      "candidateBytes": 96402,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.782,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 3
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -389.993,
+      "transform": "xor-prev",
+      "worstRegressionPct": 72.98
+    },
+    {
+      "aggregateImprovementPct": -53.19,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.48,
+      "candidate": "future-xor-prev-5+lzma",
+      "candidateBytes": 96736,
       "complete": true,
       "compressor": "lzma",
       "decision": "reject-no-gain",
-      "encodeDecodeMedianMs": 17.742,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 18.193,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 5
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -385.371,
+      "transform": "xor-prev",
+      "worstRegressionPct": 77.96
+    },
+    {
+      "aggregateImprovementPct": -53.22,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.8,
+      "candidate": "delta-prev-4+lzma",
+      "candidateBytes": 96751,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 18.312,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -409.037,
+      "transform": "delta-prev",
+      "worstRegressionPct": 73.94
+    },
+    {
+      "aggregateImprovementPct": -56.67,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.67,
+      "candidate": "future-xor-prev-5+zlib",
+      "candidateBytes": 98931,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.2,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 5
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -390.361,
+      "transform": "xor-prev",
+      "worstRegressionPct": 90.75
+    },
+    {
+      "aggregateImprovementPct": -56.96,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 46.29,
+      "candidate": "future-xor-prev-5+gzip",
+      "candidateBytes": 99112,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.804,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 5
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -392.226,
+      "transform": "xor-prev",
+      "worstRegressionPct": 90.83
+    },
+    {
+      "aggregateImprovementPct": -57.7,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.67,
+      "candidate": "delta-prev-4+zlib",
+      "candidateBytes": 99582,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.912,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -415.891,
+      "transform": "delta-prev",
+      "worstRegressionPct": 89.66
+    },
+    {
+      "aggregateImprovementPct": -57.99,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 46.29,
+      "candidate": "delta-prev-4+gzip",
+      "candidateBytes": 99763,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.905,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -417.683,
+      "transform": "delta-prev",
+      "worstRegressionPct": 89.75
+    },
+    {
+      "aggregateImprovementPct": -60.46,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 40.25,
+      "candidate": "future-delta-prev-3+bz2",
+      "candidateBytes": 101326,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 3.204,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 3
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -443.484,
+      "transform": "delta-prev",
+      "worstRegressionPct": 77.66
+    },
+    {
+      "aggregateImprovementPct": -62.81,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.06,
+      "candidate": "future-delta-prev-5+lzma",
+      "candidateBytes": 102808,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 17.217,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 5
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -445.178,
+      "transform": "delta-prev",
+      "worstRegressionPct": 87.77
+    },
+    {
+      "aggregateImprovementPct": -65.49,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 44.39,
+      "candidate": "xor-prev-4+bz2",
+      "candidateBytes": 104500,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.745,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 4
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -403.483,
+      "transform": "xor-prev",
+      "worstRegressionPct": 91.87
+    },
+    {
+      "aggregateImprovementPct": -67.66,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 46.93,
+      "candidate": "future-delta-prev-5+zlib",
+      "candidateBytes": 105873,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.886,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 5
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -451.965,
+      "transform": "delta-prev",
+      "worstRegressionPct": 103.55
+    },
+    {
+      "aggregateImprovementPct": -67.95,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 45.55,
+      "candidate": "future-delta-prev-5+gzip",
+      "candidateBytes": 106054,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.887,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 5
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -453.767,
+      "transform": "delta-prev",
+      "worstRegressionPct": 103.64
+    },
+    {
+      "aggregateImprovementPct": -73.28,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 43.22,
+      "candidate": "xor-prev-8+lzma",
+      "candidateBytes": 109419,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 17.076,
+      "evaluatedFiles": 15,
       "params": {
         "offset": 8
       },
       "roundTripFailures": 0,
-      "selectionScore": -406.172,
+      "selectionScore": -418.572,
       "transform": "xor-prev",
       "worstRegressionPct": 109.85
     },
     {
-      "aggregateImprovementPct": 14.23,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 53.62,
-      "candidate": "identity+bz2",
-      "candidateBytes": 56706,
+      "aggregateImprovementPct": -74.92,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.06,
+      "candidate": "delta-prev-4+bz2",
+      "candidateBytes": 110453,
       "complete": true,
       "compressor": "bz2",
-      "decision": "control-baseline",
-      "encodeDecodeMedianMs": 0.685,
-      "evaluatedFiles": 23,
-      "params": {},
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 3.216,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 4
+      },
       "roundTripFailures": 0,
-      "selectionScore": -91.009,
-      "transform": "identity",
-      "worstRegressionPct": -4.65
+      "selectionScore": -459.473,
+      "transform": "delta-prev",
+      "worstRegressionPct": 98.54
     },
     {
-      "aggregateImprovementPct": 14.22,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 51.29,
+      "aggregateImprovementPct": -76.38,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 43.75,
+      "candidate": "future-xor-prev-5+bz2",
+      "candidateBytes": 111380,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 3.518,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 5
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -434.626,
+      "transform": "xor-prev",
+      "worstRegressionPct": 108.16
+    },
+    {
+      "aggregateImprovementPct": -76.77,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 48.41,
+      "candidate": "xor-prev-8+zlib",
+      "candidateBytes": 111624,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.724,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 8
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -423.647,
+      "transform": "xor-prev",
+      "worstRegressionPct": 119.32
+    },
+    {
+      "aggregateImprovementPct": -77.06,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.03,
+      "candidate": "xor-prev-8+gzip",
+      "candidateBytes": 111805,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.692,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 8
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -425.518,
+      "transform": "xor-prev",
+      "worstRegressionPct": 119.4
+    },
+    {
+      "aggregateImprovementPct": -86.4,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.8,
+      "candidate": "delta-prev-8+lzma",
+      "candidateBytes": 117707,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 17.73,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 8
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -485.602,
+      "transform": "delta-prev",
+      "worstRegressionPct": 125.08
+    },
+    {
+      "aggregateImprovementPct": -87.42,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 41.84,
+      "candidate": "future-delta-prev-5+bz2",
+      "candidateBytes": 118349,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 3.223,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 5
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -495.603,
+      "transform": "delta-prev",
+      "worstRegressionPct": 116.77
+    },
+    {
+      "aggregateImprovementPct": -91.52,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.67,
+      "candidate": "delta-prev-8+zlib",
+      "candidateBytes": 120935,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.909,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 8
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -492.486,
+      "transform": "delta-prev",
+      "worstRegressionPct": 138.05
+    },
+    {
+      "aggregateImprovementPct": -91.8,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 46.29,
+      "candidate": "delta-prev-8+gzip",
+      "candidateBytes": 121116,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.948,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 8
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -494.295,
+      "transform": "delta-prev",
+      "worstRegressionPct": 138.13
+    },
+    {
+      "aggregateImprovementPct": -100.86,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 44.39,
+      "candidate": "xor-prev-8+bz2",
+      "candidateBytes": 126836,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.795,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 8
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -467.904,
+      "transform": "xor-prev",
+      "worstRegressionPct": 145.25
+    },
+    {
+      "aggregateImprovementPct": -105.54,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 43.01,
+      "candidate": "xor-prev-16+lzma",
+      "candidateBytes": 129789,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 16.316,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 16
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -484.264,
+      "transform": "xor-prev",
+      "worstRegressionPct": 167.79
+    },
+    {
+      "aggregateImprovementPct": -108.88,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 48.2,
+      "candidate": "xor-prev-16+zlib",
+      "candidateBytes": 131898,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.691,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 16
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -489.367,
+      "transform": "xor-prev",
+      "worstRegressionPct": 173.18
+    },
+    {
+      "aggregateImprovementPct": -109.16,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 46.82,
+      "candidate": "xor-prev-16+gzip",
+      "candidateBytes": 132079,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.752,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 16
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -491.258,
+      "transform": "xor-prev",
+      "worstRegressionPct": 173.32
+    },
+    {
+      "aggregateImprovementPct": -116.36,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.27,
+      "candidate": "delta-prev-8+bz2",
+      "candidateBytes": 136625,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 3.198,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 8
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -536.116,
+      "transform": "delta-prev",
+      "worstRegressionPct": 160.96
+    },
+    {
+      "aggregateImprovementPct": -123.9,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.58,
+      "candidate": "delta-prev-16+lzma",
+      "candidateBytes": 141386,
+      "complete": true,
+      "compressor": "lzma",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 17.295,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 16
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -563.648,
+      "transform": "delta-prev",
+      "worstRegressionPct": 192.04
+    },
+    {
+      "aggregateImprovementPct": -129.49,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.46,
+      "candidate": "delta-prev-16+zlib",
+      "candidateBytes": 144914,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 1.906,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 16
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -570.633,
+      "transform": "delta-prev",
+      "worstRegressionPct": 200.61
+    },
+    {
+      "aggregateImprovementPct": -129.78,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 46.08,
+      "candidate": "delta-prev-16+gzip",
+      "candidateBytes": 145095,
+      "complete": true,
+      "compressor": "gzip",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.302,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 16
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -572.393,
+      "transform": "delta-prev",
+      "worstRegressionPct": 200.75
+    },
+    {
+      "aggregateImprovementPct": -135.3,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 44.49,
+      "candidate": "xor-prev-16+bz2",
+      "candidateBytes": 148584,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.783,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 16
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -533.674,
+      "transform": "xor-prev",
+      "worstRegressionPct": 203.23
+    },
+    {
+      "aggregateImprovementPct": -144.0,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 26.06,
+      "candidate": "segmented-oracle-1024+zlib",
+      "candidateBytes": 154075,
+      "complete": true,
+      "compressor": "zlib",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 2.644,
+      "evaluatedFiles": 15,
+      "params": {
+        "blockSize": 1024
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -567.366,
+      "transform": "segmented-oracle",
+      "worstRegressionPct": 308.35
+    },
+    {
+      "aggregateImprovementPct": -157.14,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 42.16,
+      "candidate": "delta-prev-16+bz2",
+      "candidateBytes": 162372,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "reject-no-gain",
+      "encodeDecodeMedianMs": 3.262,
+      "evaluatedFiles": 15,
+      "params": {
+        "offset": 16
+      },
+      "roundTripFailures": 0,
+      "selectionScore": -614.244,
+      "transform": "delta-prev",
+      "worstRegressionPct": 230.43
+    },
+    {
+      "aggregateImprovementPct": 9.68,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 44.49,
       "candidate": "identity+lzma",
-      "candidateBytes": 56714,
+      "candidateBytes": 57036,
       "complete": true,
       "compressor": "lzma",
       "decision": "control-baseline",
-      "encodeDecodeMedianMs": 13.123,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 16.573,
+      "evaluatedFiles": 15,
       "params": {},
       "roundTripFailures": 0,
-      "selectionScore": -68.222,
+      "selectionScore": -70.895,
       "transform": "identity",
-      "worstRegressionPct": -4.35
+      "worstRegressionPct": -3.42
     },
     {
-      "aggregateImprovementPct": 13.05,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 54.21,
+      "aggregateImprovementPct": 9.55,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 47.67,
+      "candidate": "identity+bz2",
+      "candidateBytes": 57117,
+      "complete": true,
+      "compressor": "bz2",
+      "decision": "control-baseline",
+      "encodeDecodeMedianMs": 1.045,
+      "evaluatedFiles": 15,
+      "params": {},
+      "roundTripFailures": 0,
+      "selectionScore": -94.289,
+      "transform": "identity",
+      "worstRegressionPct": -2.51
+    },
+    {
+      "aggregateImprovementPct": 7.34,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 50.32,
       "candidate": "identity+zlib",
-      "candidateBytes": 57488,
+      "candidateBytes": 58512,
       "complete": true,
       "compressor": "zlib",
       "decision": "control-baseline",
-      "encodeDecodeMedianMs": 0.136,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 0.212,
+      "evaluatedFiles": 15,
       "params": {},
       "roundTripFailures": 0,
-      "selectionScore": -72.083,
+      "selectionScore": -74.346,
       "transform": "identity",
-      "worstRegressionPct": 7.65
+      "worstRegressionPct": 6.44
     },
     {
-      "aggregateImprovementPct": 12.63,
-      "baselineBytes": 66115,
-      "bestFileGainPct": 52.69,
+      "aggregateImprovementPct": 7.05,
+      "baselineBytes": 63146,
+      "bestFileGainPct": 49.05,
       "candidate": "identity+gzip",
-      "candidateBytes": 57766,
+      "candidateBytes": 58692,
       "complete": true,
       "compressor": "gzip",
       "decision": "control-baseline",
-      "encodeDecodeMedianMs": 0.149,
-      "evaluatedFiles": 23,
+      "encodeDecodeMedianMs": 0.222,
+      "evaluatedFiles": 15,
       "params": {},
       "roundTripFailures": 0,
-      "selectionScore": -72.709,
+      "selectionScore": -75.48,
       "transform": "identity",
-      "worstRegressionPct": 8.07
+      "worstRegressionPct": 6.53
     }
   ],
-  "elapsedSeconds": 14.031,
-  "evaluatedCandidateCount": 32,
-  "fileCount": 23,
+  "elapsedSeconds": 40.031,
+  "evaluatedCandidateCount": 73,
+  "fileCount": 15,
   "inputState": {
-    "keys": 34,
+    "keys": 48,
     "loaded": true,
-    "runCount": 203
+    "runCount": 240
   },
   "maxPasses": 2,
   "modelState": {
     "compressor:bz2": {
-      "averageReward": -92.867,
-      "count": 2443,
-      "score": -226872.898359
+      "averageReward": -96.103,
+      "count": 3025,
+      "score": -290712.211523
     },
     "compressor:gzip": {
-      "averageReward": -73.95,
-      "count": 2444,
-      "score": -180733.290517
+      "averageReward": -76.684,
+      "count": 3028,
+      "score": -232197.770825
     },
     "compressor:lzma": {
-      "averageReward": -69.898,
-      "count": 2445,
-      "score": -170899.514273
+      "averageReward": -72.465,
+      "count": 3029,
+      "score": -219496.233299
     },
     "compressor:zlib": {
-      "averageReward": -73.506,
-      "count": 2444,
-      "score": -179649.008058
+      "averageReward": -75.589,
+      "count": 3148,
+      "score": -237954.926818
     },
     "offset:delta-prev:1": {
-      "averageReward": -14.891,
-      "count": 816,
-      "score": -12150.6954
+      "averageReward": -15.884,
+      "count": 964,
+      "score": -15312.4677
     },
     "offset:delta-prev:16": {
-      "averageReward": -200.584,
-      "count": 812,
-      "score": -162874.09975
+      "averageReward": -204.668,
+      "count": 960,
+      "score": -196481.69145
     },
     "offset:delta-prev:2": {
-      "averageReward": -43.981,
-      "count": 816,
-      "score": -35888.255
+      "averageReward": -45.365,
+      "count": 964,
+      "score": -43731.91875
+    },
+    "offset:delta-prev:3": {
+      "averageReward": -79.533,
+      "count": 140,
+      "score": -11134.6084
+    },
+    "offset:delta-prev:36": {
+      "averageReward": -279.204,
+      "count": 12,
+      "score": -3350.4457
     },
     "offset:delta-prev:4": {
-      "averageReward": -85.349,
-      "count": 815,
-      "score": -69559.5573
+      "averageReward": -87.461,
+      "count": 963,
+      "score": -84224.54135
+    },
+    "offset:delta-prev:5": {
+      "averageReward": -117.118,
+      "count": 128,
+      "score": -14991.1547
     },
     "offset:delta-prev:8": {
-      "averageReward": -140.379,
-      "count": 812,
-      "score": -113988.0315
+      "averageReward": -143.306,
+      "count": 960,
+      "score": -137574.05165
     },
     "offset:xor-prev:1": {
-      "averageReward": -11.237,
-      "count": 816,
-      "score": -9169.17245
+      "averageReward": -12.144,
+      "count": 964,
+      "score": -11706.63435
     },
     "offset:xor-prev:16": {
-      "averageReward": -170.118,
-      "count": 812,
-      "score": -138135.73005
+      "averageReward": -173.792,
+      "count": 960,
+      "score": -166840.4616
     },
     "offset:xor-prev:2": {
-      "averageReward": -36.185,
-      "count": 816,
-      "score": -29526.99295
+      "averageReward": -37.515,
+      "count": 964,
+      "score": -36164.2718
+    },
+    "offset:xor-prev:3": {
+      "averageReward": -67.806,
+      "count": 140,
+      "score": -9492.83045
+    },
+    "offset:xor-prev:36": {
+      "averageReward": -239.316,
+      "count": 12,
+      "score": -2871.7957
     },
     "offset:xor-prev:4": {
-      "averageReward": -72.607,
-      "count": 816,
-      "score": -59246.9711
+      "averageReward": -74.54,
+      "count": 964,
+      "score": -71856.38825
+    },
+    "offset:xor-prev:5": {
+      "averageReward": -100.572,
+      "count": 126,
+      "score": -12672.13095
     },
     "offset:xor-prev:8": {
-      "averageReward": -119.451,
-      "count": 813,
-      "score": -97113.68245
+      "averageReward": -122.076,
+      "count": 961,
+      "score": -117315.31115
     },
     "pair:delta-avg2+bz2": {
-      "averageReward": -48.952,
-      "count": 204,
-      "score": -9986.12415
+      "averageReward": -50.315,
+      "count": 241,
+      "score": -12126.02865
     },
     "pair:delta-avg2+gzip": {
-      "averageReward": -39.476,
-      "count": 204,
-      "score": -8053.06445
+      "averageReward": -41.089,
+      "count": 241,
+      "score": -9902.43595
     },
     "pair:delta-avg2+lzma": {
-      "averageReward": -35.475,
-      "count": 204,
-      "score": -7236.83085
+      "averageReward": -36.724,
+      "count": 241,
+      "score": -8850.5646
     },
     "pair:delta-avg2+zlib": {
-      "averageReward": -38.969,
-      "count": 204,
-      "score": -7949.6585
+      "averageReward": -40.601,
+      "count": 241,
+      "score": -9784.9287
     },
     "pair:delta-prev+bz2": {
-      "averageReward": -114.487,
-      "count": 1017,
-      "score": -116433.2476
+      "averageReward": -117.517,
+      "count": 1272,
+      "score": -149482.0084
     },
     "pair:delta-prev+gzip": {
-      "averageReward": -92.935,
-      "count": 1018,
-      "score": -94608.0567
+      "averageReward": -95.515,
+      "count": 1273,
+      "score": -121590.42225
     },
     "pair:delta-prev+lzma": {
-      "averageReward": -87.665,
-      "count": 1018,
-      "score": -89242.6589
+      "averageReward": -90.076,
+      "count": 1273,
+      "score": -114667.19865
     },
     "pair:delta-prev+zlib": {
-      "averageReward": -92.511,
-      "count": 1018,
-      "score": -94176.67575
+      "averageReward": -95.099,
+      "count": 1273,
+      "score": -121061.2504
     },
     "pair:identity+bz2": {
-      "averageReward": 3.669,
-      "count": 204,
-      "score": 748.478986
+      "averageReward": 3.523,
+      "count": 241,
+      "score": 848.965773
     },
     "pair:identity+gzip": {
-      "averageReward": 3.05,
-      "count": 204,
-      "score": 622.201519
+      "averageReward": 2.907,
+      "count": 241,
+      "score": 700.641959
     },
     "pair:identity+lzma": {
-      "averageReward": 3.438,
-      "count": 204,
-      "score": 701.337778
+      "averageReward": 3.298,
+      "count": 241,
+      "score": 794.809354
     },
     "pair:identity+zlib": {
-      "averageReward": 3.197,
-      "count": 204,
-      "score": 652.136378
+      "averageReward": 3.045,
+      "count": 241,
+      "score": 733.901415
+    },
+    "pair:segmented-oracle+zlib": {
+      "averageReward": -248.525,
+      "count": 25,
+      "score": -6213.1265
+    },
+    "pair:segmented-stream-boundary-oracle+zlib": {
+      "averageReward": -33.806,
+      "count": 14,
+      "score": -473.28685
+    },
+    "pair:segmented-stream-oracle+zlib": {
+      "averageReward": -3.394,
+      "count": 64,
+      "score": -217.1877
+    },
+    "pair:segmented-stream-var-oracle+zlib": {
+      "averageReward": -8.894,
+      "count": 17,
+      "score": -151.1981
     },
     "pair:xor-prev+bz2": {
-      "averageReward": -99.413,
-      "count": 1018,
-      "score": -101202.0056
+      "averageReward": -102.245,
+      "count": 1271,
+      "score": -129953.14025
     },
     "pair:xor-prev+gzip": {
-      "averageReward": -77.303,
-      "count": 1018,
-      "score": -78694.3709
+      "averageReward": -79.659,
+      "count": 1273,
+      "score": -101405.5546
     },
     "pair:xor-prev+lzma": {
-      "averageReward": -73.721,
-      "count": 1019,
-      "score": -75121.3623
+      "averageReward": -75.96,
+      "count": 1274,
+      "score": -96773.2794
     },
     "pair:xor-prev+zlib": {
-      "averageReward": -76.793,
-      "count": 1018,
-      "score": -78174.8102
+      "averageReward": -79.173,
+      "count": 1273,
+      "score": -100787.85
     },
     "transform:delta-avg2": {
-      "averageReward": -40.718,
-      "count": 816,
-      "score": -33225.67795
+      "averageReward": -42.183,
+      "count": 964,
+      "score": -40663.9579
     },
     "transform:delta-prev": {
-      "averageReward": -96.895,
-      "count": 4071,
-      "score": -394460.63895
+      "averageReward": -99.548,
+      "count": 5091,
+      "score": -506800.8797
     },
     "transform:identity": {
-      "averageReward": 3.338,
-      "count": 816,
-      "score": 2724.154681
+      "averageReward": 3.193,
+      "count": 964,
+      "score": 3078.318516
+    },
+    "transform:segmented-oracle": {
+      "averageReward": -248.525,
+      "count": 25,
+      "score": -6213.1265
+    },
+    "transform:segmented-stream-boundary-oracle": {
+      "averageReward": -33.806,
+      "count": 14,
+      "score": -473.28685
+    },
+    "transform:segmented-stream-oracle": {
+      "averageReward": -3.394,
+      "count": 64,
+      "score": -217.1877
+    },
+    "transform:segmented-stream-var-oracle": {
+      "averageReward": -8.894,
+      "count": 17,
+      "score": -151.1981
     },
     "transform:xor-prev": {
-      "averageReward": -81.805,
-      "count": 4073,
-      "score": -333192.549
+      "averageReward": -84.251,
+      "count": 5091,
+      "score": -428919.82425
     }
   },
   "note": "Experimental local predictor search. No raw file contents are embedded in this result.",
   "platform": "Windows-10-10.0.19045-SP0",
   "python": "3.12.10",
+  "researchProbeCount": 9,
   "resultLicense": "CC0-1.0",
   "schemaVersion": 1,
   "scriptLicense": "Apache-2.0",
   "searchMode": "adaptive",
   "selectionTrace": [
     {
-      "aggregateImprovementPct": 14.22,
+      "aggregateImprovementPct": 9.68,
       "candidate": "identity+lzma",
       "decision": "control-baseline",
-      "selectionScore": -68.222
+      "selectionScore": -70.895
     },
     {
-      "aggregateImprovementPct": 13.05,
+      "aggregateImprovementPct": 7.34,
       "candidate": "identity+zlib",
       "decision": "control-baseline",
-      "selectionScore": -72.083
+      "selectionScore": -74.346
     },
     {
-      "aggregateImprovementPct": 12.63,
+      "aggregateImprovementPct": 7.05,
       "candidate": "identity+gzip",
       "decision": "control-baseline",
-      "selectionScore": -72.709
-    },
-    {
-      "aggregateImprovementPct": 14.23,
-      "candidate": "identity+bz2",
-      "decision": "control-baseline",
-      "selectionScore": -91.009
-    },
-    {
-      "aggregateImprovementPct": -16.44,
-      "candidate": "delta-avg2+lzma",
-      "decision": "reject-no-gain",
-      "selectionScore": -182.065
-    },
-    {
-      "aggregateImprovementPct": -18.68,
-      "candidate": "delta-avg2+zlib",
-      "decision": "reject-no-gain",
-      "selectionScore": -187.973
-    },
-    {
-      "aggregateImprovementPct": -19.1,
-      "candidate": "delta-avg2+gzip",
-      "decision": "reject-no-gain",
-      "selectionScore": -189.157
-    },
-    {
-      "aggregateImprovementPct": -26.55,
-      "candidate": "delta-avg2+bz2",
-      "decision": "reject-no-gain",
-      "selectionScore": -217.941
+      "selectionScore": -75.48
     },
     {
       "aggregateImprovementPct": -1.18,
+      "candidate": "segmented-stream-oracle-512+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -81.309
+    },
+    {
+      "aggregateImprovementPct": -0.07,
+      "candidate": "segmented-stream-oracle-1024+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -81.439
+    },
+    {
+      "aggregateImprovementPct": 0.19,
+      "candidate": "segmented-stream-oracle-2048+zlib",
+      "decision": "watch-candidate",
+      "selectionScore": -81.462
+    },
+    {
+      "aggregateImprovementPct": 0.3,
+      "candidate": "segmented-stream-oracle-4096+zlib",
+      "decision": "watch-candidate",
+      "selectionScore": -81.469
+    },
+    {
+      "aggregateImprovementPct": 1.42,
+      "candidate": "segmented-stream-oracle-4096-project-text-gated+zlib",
+      "decision": "watch-candidate",
+      "selectionScore": -81.469
+    },
+    {
+      "aggregateImprovementPct": 1.78,
+      "candidate": "segmented-stream-oracle-1024-4096-project-text-gated+zlib",
+      "decision": "watch-candidate",
+      "selectionScore": -81.349
+    },
+    {
+      "aggregateImprovementPct": -3.58,
+      "candidate": "segmented-stream-var-oracle-512-4096+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -92.095
+    },
+    {
+      "aggregateImprovementPct": 9.55,
+      "candidate": "identity+bz2",
+      "decision": "control-baseline",
+      "selectionScore": -94.289
+    },
+    {
+      "aggregateImprovementPct": -11.08,
+      "candidate": "segmented-stream-boundary-oracle-512-4096+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -142.029
+    },
+    {
+      "aggregateImprovementPct": -25.65,
+      "candidate": "delta-avg2+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -190.966
+    },
+    {
+      "aggregateImprovementPct": -30.03,
+      "candidate": "delta-avg2+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -196.649
+    },
+    {
+      "aggregateImprovementPct": -30.31,
+      "candidate": "delta-avg2+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -198.516
+    },
+    {
+      "aggregateImprovementPct": -36.21,
+      "candidate": "delta-avg2+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -227.593
+    },
+    {
+      "aggregateImprovementPct": -6.92,
       "candidate": "xor-prev-1+lzma",
       "decision": "reject-no-gain",
-      "selectionScore": -255.101
+      "selectionScore": -263.796
     },
     {
-      "aggregateImprovementPct": -2.17,
+      "aggregateImprovementPct": -9.54,
       "candidate": "xor-prev-1+zlib",
       "decision": "reject-no-gain",
-      "selectionScore": -260.609
+      "selectionScore": -268.807
     },
     {
-      "aggregateImprovementPct": -2.59,
+      "aggregateImprovementPct": -9.82,
       "candidate": "xor-prev-1+gzip",
       "decision": "reject-no-gain",
-      "selectionScore": -261.783
+      "selectionScore": -270.655
     },
     {
-      "aggregateImprovementPct": -13.93,
+      "aggregateImprovementPct": -22.58,
       "candidate": "xor-prev-2+lzma",
       "decision": "reject-no-gain",
-      "selectionScore": -291.563
+      "selectionScore": -301.306
     },
     {
-      "aggregateImprovementPct": -3.52,
+      "aggregateImprovementPct": -9.46,
       "candidate": "delta-prev-1+lzma",
       "decision": "reject-no-gain",
-      "selectionScore": -293.904
+      "selectionScore": -303.236
     },
     {
-      "aggregateImprovementPct": -14.85,
+      "aggregateImprovementPct": -24.79,
       "candidate": "xor-prev-2+zlib",
       "decision": "reject-no-gain",
-      "selectionScore": -297.077
+      "selectionScore": -306.327
     },
     {
-      "aggregateImprovementPct": -15.27,
+      "aggregateImprovementPct": -25.08,
       "candidate": "xor-prev-2+gzip",
       "decision": "reject-no-gain",
-      "selectionScore": -298.25
+      "selectionScore": -308.18
     },
     {
-      "aggregateImprovementPct": -5.48,
+      "aggregateImprovementPct": -13.19,
       "candidate": "delta-prev-1+zlib",
       "decision": "reject-no-gain",
-      "selectionScore": -301.153
+      "selectionScore": -310.055
     },
     {
-      "aggregateImprovementPct": -5.9,
+      "aggregateImprovementPct": -13.48,
       "candidate": "delta-prev-1+gzip",
       "decision": "reject-no-gain",
-      "selectionScore": -302.318
+      "selectionScore": -311.832
     },
     {
-      "aggregateImprovementPct": -7.25,
+      "aggregateImprovementPct": -12.24,
       "candidate": "xor-prev-1+bz2",
       "decision": "reject-no-gain",
-      "selectionScore": -303.169
+      "selectionScore": -313.023
     },
     {
-      "aggregateImprovementPct": -19.12,
+      "aggregateImprovementPct": -34.94,
+      "candidate": "future-xor-prev-3+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -340.778
+    },
+    {
+      "aggregateImprovementPct": -38.03,
+      "candidate": "future-xor-prev-3+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -345.763
+    },
+    {
+      "aggregateImprovementPct": -28.18,
       "candidate": "delta-prev-2+lzma",
       "decision": "reject-no-gain",
-      "selectionScore": -336.709
+      "selectionScore": -347.401
     },
     {
-      "aggregateImprovementPct": -25.76,
+      "aggregateImprovementPct": -38.31,
+      "candidate": "future-xor-prev-3+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -347.628
+    },
+    {
+      "aggregateImprovementPct": -35.25,
       "candidate": "xor-prev-2+bz2",
       "decision": "reject-no-gain",
-      "selectionScore": -339.63
+      "selectionScore": -350.529
     },
     {
-      "aggregateImprovementPct": -8.77,
+      "aggregateImprovementPct": -13.74,
       "candidate": "delta-prev-1+bz2",
       "decision": "reject-no-gain",
-      "selectionScore": -343.07
+      "selectionScore": -353.626
     },
     {
-      "aggregateImprovementPct": -31.68,
+      "aggregateImprovementPct": -44.72,
       "candidate": "xor-prev-4+lzma",
       "decision": "reject-no-gain",
-      "selectionScore": -343.725
+      "selectionScore": -354.212
     },
     {
-      "aggregateImprovementPct": -20.01,
+      "aggregateImprovementPct": -30.62,
       "candidate": "delta-prev-2+zlib",
       "decision": "reject-no-gain",
-      "selectionScore": -343.944
+      "selectionScore": -354.219
     },
     {
-      "aggregateImprovementPct": -20.43,
+      "aggregateImprovementPct": -30.91,
       "candidate": "delta-prev-2+gzip",
       "decision": "reject-no-gain",
-      "selectionScore": -345.11
+      "selectionScore": -355.999
     },
     {
-      "aggregateImprovementPct": -34.16,
+      "aggregateImprovementPct": -48.08,
       "candidate": "xor-prev-4+zlib",
       "decision": "reject-no-gain",
-      "selectionScore": -349.24
+      "selectionScore": -359.256
     },
     {
-      "aggregateImprovementPct": -34.58,
+      "aggregateImprovementPct": -48.37,
       "candidate": "xor-prev-4+gzip",
       "decision": "reject-no-gain",
-      "selectionScore": -350.421
+      "selectionScore": -361.117
     },
     {
-      "aggregateImprovementPct": -30.87,
+      "aggregateImprovementPct": -53.19,
+      "candidate": "future-xor-prev-5+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -385.371
+    },
+    {
+      "aggregateImprovementPct": -52.67,
+      "candidate": "future-xor-prev-3+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -389.993
+    },
+    {
+      "aggregateImprovementPct": -56.67,
+      "candidate": "future-xor-prev-5+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -390.361
+    },
+    {
+      "aggregateImprovementPct": -56.96,
+      "candidate": "future-xor-prev-5+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -392.226
+    },
+    {
+      "aggregateImprovementPct": -42.32,
+      "candidate": "future-delta-prev-3+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -393.109
+    },
+    {
+      "aggregateImprovementPct": -40.11,
       "candidate": "delta-prev-2+bz2",
       "decision": "reject-no-gain",
-      "selectionScore": -385.848
+      "selectionScore": -397.776
     },
     {
-      "aggregateImprovementPct": -48.63,
+      "aggregateImprovementPct": -46.14,
+      "candidate": "future-delta-prev-3+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -399.893
+    },
+    {
+      "aggregateImprovementPct": -46.42,
+      "candidate": "future-delta-prev-3+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -401.692
+    },
+    {
+      "aggregateImprovementPct": -65.49,
       "candidate": "xor-prev-4+bz2",
       "decision": "reject-no-gain",
-      "selectionScore": -391.806
+      "selectionScore": -403.483
     },
     {
-      "aggregateImprovementPct": -39.36,
+      "aggregateImprovementPct": -53.22,
       "candidate": "delta-prev-4+lzma",
       "decision": "reject-no-gain",
-      "selectionScore": -397.837
+      "selectionScore": -409.037
     },
     {
-      "aggregateImprovementPct": -42.52,
+      "aggregateImprovementPct": -57.7,
       "candidate": "delta-prev-4+zlib",
       "decision": "reject-no-gain",
-      "selectionScore": -405.091
+      "selectionScore": -415.891
     },
     {
-      "aggregateImprovementPct": -53.68,
+      "aggregateImprovementPct": -57.99,
+      "candidate": "delta-prev-4+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -417.683
+    },
+    {
+      "aggregateImprovementPct": -73.28,
       "candidate": "xor-prev-8+lzma",
       "decision": "reject-no-gain",
-      "selectionScore": -406.172
+      "selectionScore": -418.572
     },
     {
-      "aggregateImprovementPct": 0.0,
-      "candidate": "delta-prev-4+gzip",
-      "decision": "incomplete",
-      "selectionScore": -406.266
+      "aggregateImprovementPct": -76.77,
+      "candidate": "xor-prev-8+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -423.647
+    },
+    {
+      "aggregateImprovementPct": -77.06,
+      "candidate": "xor-prev-8+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -425.518
+    },
+    {
+      "aggregateImprovementPct": -76.38,
+      "candidate": "future-xor-prev-5+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -434.626
+    },
+    {
+      "aggregateImprovementPct": -60.46,
+      "candidate": "future-delta-prev-3+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -443.484
+    },
+    {
+      "aggregateImprovementPct": -62.81,
+      "candidate": "future-delta-prev-5+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -445.178
+    },
+    {
+      "aggregateImprovementPct": -67.66,
+      "candidate": "future-delta-prev-5+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -451.965
+    },
+    {
+      "aggregateImprovementPct": -67.95,
+      "candidate": "future-delta-prev-5+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -453.767
+    },
+    {
+      "aggregateImprovementPct": -74.92,
+      "candidate": "delta-prev-4+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -459.473
+    },
+    {
+      "aggregateImprovementPct": -100.86,
+      "candidate": "xor-prev-8+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -467.904
+    },
+    {
+      "aggregateImprovementPct": -105.54,
+      "candidate": "xor-prev-16+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -484.264
+    },
+    {
+      "aggregateImprovementPct": -86.4,
+      "candidate": "delta-prev-8+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -485.602
+    },
+    {
+      "aggregateImprovementPct": -108.88,
+      "candidate": "xor-prev-16+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -489.367
+    },
+    {
+      "aggregateImprovementPct": -109.16,
+      "candidate": "xor-prev-16+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -491.258
+    },
+    {
+      "aggregateImprovementPct": -91.52,
+      "candidate": "delta-prev-8+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -492.486
+    },
+    {
+      "aggregateImprovementPct": -91.8,
+      "candidate": "delta-prev-8+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -494.295
+    },
+    {
+      "aggregateImprovementPct": -87.42,
+      "candidate": "future-delta-prev-5+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -495.603
+    },
+    {
+      "aggregateImprovementPct": -135.3,
+      "candidate": "xor-prev-16+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -533.674
+    },
+    {
+      "aggregateImprovementPct": -116.36,
+      "candidate": "delta-prev-8+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -536.116
+    },
+    {
+      "aggregateImprovementPct": -123.9,
+      "candidate": "delta-prev-16+lzma",
+      "decision": "reject-no-gain",
+      "selectionScore": -563.648
+    },
+    {
+      "aggregateImprovementPct": -144.0,
+      "candidate": "segmented-oracle-1024+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -567.366
+    },
+    {
+      "aggregateImprovementPct": -129.49,
+      "candidate": "delta-prev-16+zlib",
+      "decision": "reject-no-gain",
+      "selectionScore": -570.633
+    },
+    {
+      "aggregateImprovementPct": -129.78,
+      "candidate": "delta-prev-16+gzip",
+      "decision": "reject-no-gain",
+      "selectionScore": -572.393
+    },
+    {
+      "aggregateImprovementPct": -157.14,
+      "candidate": "delta-prev-16+bz2",
+      "decision": "reject-no-gain",
+      "selectionScore": -614.244
     }
   ],
   "skipped": [
@@ -1033,6 +2152,254 @@
       "reason": "excluded"
     },
     {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-01-main-mixed.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-02-readme-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-03-docs-core.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-04-src-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-05-tests-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-06-benchmarks-code.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-07-docs-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-08-docs-wide.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-09-src-tests.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-10-all-lite.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-state.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-batch10-20260707-222522-summary.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-filtered-experiment-20260707-221422.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-filtered-state-20260707-221422.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-01-main-mixed.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-02-readme-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-03-docs-core.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-04-src-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-05-tests-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-06-benchmarks-code.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-07-docs-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-08-docs-wide.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-09-src-tests.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-10-all-lite.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-state.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-batch10-20260707-223637-summary.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-01-main-mixed.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-02-readme-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-03-docs-core.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-04-src-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-05-tests-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-06-benchmarks-code.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-07-docs-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-08-docs-wide.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-09-src-tests.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-10-all-lite.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-state.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-gated-tuned-batch10-20260707-224217-summary.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-learning-experiment-20260707-220251.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-learning-experiment-20260707-220251.log",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-learning-experiment-20260707-220251.meta.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-4096-learning-state-20260707-220251.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-01-main-mixed.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-02-readme-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-03-docs-core.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-04-src-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-05-tests-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-06-benchmarks-code.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-07-docs-only.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-08-docs-wide.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-09-src-tests.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-10-all-lite.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-state.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-fixed-selector-batch10-20260707-225302-summary.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-search-background-history.jsonl",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-search-background-latest.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-search-background-status.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-search-background.stderr.log",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-search-background.stdout.log",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/predictor-state.json",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/pytest-status-20260707-193232.log",
+      "reason": "excluded"
+    },
+    {
+      "path": "benchmarks/results/transport-baseline.json",
+      "reason": "excluded"
+    },
+    {
       "path": "benchmarks/__pycache__/benchmark_real_data.cpython-312.pyc",
       "reason": "excluded"
     },
@@ -1046,14 +2413,14 @@
     }
   ],
   "stateOutput": {
-    "keys": 34,
+    "keys": 48,
     "written": true
   },
   "stateOutputRequested": true,
-  "stoppedReason": "time-limit",
+  "stoppedReason": "complete",
   "thresholds": {
     "maxWorstRegressionPct": 2.0,
     "minImprovementPct": 1.0
   },
-  "timeLimitSeconds": 14.0
+  "timeLimitSeconds": 120.0
 }
